@@ -8,6 +8,7 @@ node_modules/
 dist/
 dist-android/
 dist-ios/
+build-apk/
 build/
 .next/
 
