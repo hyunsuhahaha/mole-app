@@ -1,3 +1,12 @@
-# 두더지
+# Stock Digger
 
-앱 프로젝트 저장소입니다.
+A playful, research-first stock screening MVP built with Expo and React Native.
+
+## Run
+
+```bash
+npm install
+npm start
+```
+
+Open the project with Expo Go on Android or iOS. All research results are mock data.
