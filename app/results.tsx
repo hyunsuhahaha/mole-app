@@ -1,3 +1,144 @@
-import{SafeAreaView}from'react-native-safe-area-context';import{ScrollView,View,Text,Pressable,StyleSheet}from'react-native';import{router}from'expo-router';import{Mole}from'../src/components/Mole';import{useDigStore}from'../src/store/useDigStore';import{mockResults}from'../src/data/mock';import{colors,spacing}from'../src/theme/tokens';
-export default function Results(){const stored=useDigStore(x=>x.results);const results=stored.length?stored:mockResults;return <SafeAreaView style={s.page}><View style={s.header}><Pressable onPress={()=>router.back()}><Text style={s.back}>←</Text></Pressable><View><Text style={s.kicker}>최종 발굴 보고서</Text><Text style={s.title}>근거가 남은 5개</Text></View><Text style={s.step}>03 / 04</Text></View><View style={s.found}><Mole mood="found" size={82}/><Text style={s.foundCopy}>순위보다 근거를 먼저 보세요.{`\n`}점수는 Risk Dig 이후 결과입니다.</Text></View><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.list}>{results.map((stock,i)=><Pressable key={stock.ticker} onPress={()=>router.push({pathname:'/stock/[ticker]',params:{ticker:stock.ticker}})} style={({pressed})=>[s.row,pressed&&s.pressed]}><Text style={s.rank}>{String(i+1).padStart(2,'0')}</Text><View style={s.body}><View style={s.stockHead}><View><Text style={s.ticker}>{stock.ticker}</Text><Text style={s.company}>{stock.company}</Text></View><View style={s.score}><Text style={s.scoreValue}>{stock.score}</Text><Text style={s.scoreLabel}>최종 점수</Text></View></View><Text style={s.reason}>{stock.reason}</Text><View style={s.risk}><Text style={s.riskMark}>!</Text><Text style={s.riskText}>{stock.risk}</Text><Text style={s.open}>근거 보기 →</Text></View></View></Pressable>)}</ScrollView></SafeAreaView>}
-const s=StyleSheet.create({page:{flex:1,backgroundColor:colors.cream},header:{marginHorizontal:spacing.lg,paddingVertical:14,borderBottomWidth:2,borderColor:colors.ink,flexDirection:'row',alignItems:'center',gap:14},back:{fontSize:26,color:colors.ink},kicker:{fontSize:10,fontWeight:'900',letterSpacing:1.4,color:colors.green},title:{fontSize:28,fontWeight:'900',color:colors.ink},step:{marginLeft:'auto',fontSize:11,color:colors.muted},found:{marginHorizontal:spacing.lg,flexDirection:'row',alignItems:'center',justifyContent:'center',gap:18,paddingVertical:8},foundCopy:{fontSize:12,lineHeight:18,fontWeight:'700',color:colors.muted},list:{paddingHorizontal:spacing.lg,paddingBottom:24},row:{flexDirection:'row',paddingVertical:18,borderTopWidth:1,borderColor:colors.line},pressed:{opacity:.6},rank:{width:34,fontSize:11,fontWeight:'900',color:colors.gold},body:{flex:1},stockHead:{flexDirection:'row'},ticker:{fontSize:25,fontWeight:'900',color:colors.ink},company:{fontSize:12,color:colors.muted},score:{marginLeft:'auto',alignItems:'flex-end'},scoreValue:{fontSize:26,fontWeight:'900',color:colors.green},scoreLabel:{fontSize:9,fontWeight:'900',color:colors.muted},reason:{fontSize:14,lineHeight:20,color:colors.ink,fontWeight:'700',marginTop:12},risk:{flexDirection:'row',alignItems:'center',gap:7,marginTop:9},riskMark:{width:20,height:20,textAlign:'center',lineHeight:20,borderRadius:10,backgroundColor:colors.danger,color:colors.paper,fontWeight:'900'},riskText:{fontSize:11,color:colors.danger,fontWeight:'700'},open:{marginLeft:'auto',fontSize:11,color:colors.green,fontWeight:'900'}});
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import { router } from "expo-router";
+import { Mole } from "../src/components/Mole";
+import { useDigStore } from "../src/store/useDigStore";
+import { mockResults } from "../src/data/mock";
+import { colors, spacing } from "../src/theme/tokens";
+export default function Results() {
+  const stored = useDigStore((x) => x.results);
+  const results = stored.length ? stored : mockResults;
+  return (
+    <SafeAreaView style={s.page}>
+      <View style={s.header}>
+        <Pressable onPress={() => router.back()}>
+          <Text style={s.back}>←</Text>
+        </Pressable>
+        <View>
+          <Text style={s.kicker}>두더지가 찾은 후보</Text>
+          <Text style={s.title}>조건을 통과한 {results.length}개</Text>
+        </View>
+        <Text style={s.step}>03 / 04</Text>
+      </View>
+      <View style={s.found}>
+        <Mole mood="found" size={82} />
+        <Text style={s.foundCopy}>
+          순위보다 이유를 먼저 보세요.{`\n`}점수는 위험까지 확인한 결과예요.
+        </Text>
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={s.list}
+      >
+        {results.map((stock, i) => (
+          <Pressable
+            key={stock.ticker}
+            onPress={() =>
+              router.push({
+                pathname: "/stock/[ticker]",
+                params: { ticker: stock.ticker },
+              })
+            }
+            style={({ pressed }) => [s.row, pressed && s.pressed]}
+          >
+            <Text style={s.rank}>{String(i + 1).padStart(2, "0")}</Text>
+            <View style={s.body}>
+              <View style={s.stockHead}>
+                <View>
+                  <Text style={s.ticker}>{stock.ticker}</Text>
+                  <Text style={s.company}>{stock.company}</Text>
+                </View>
+                <View style={s.score}>
+                  <Text style={s.scoreValue}>{stock.score}</Text>
+                  <Text style={s.scoreLabel}>종합 점수</Text>
+                </View>
+              </View>
+              <Text style={s.reason}>{stock.reason}</Text>
+              <View style={s.risk}>
+                <Text style={s.riskMark}>!</Text>
+                <Text style={s.riskText}>{stock.risk}</Text>
+                <Text style={s.open}>쉽게 보기 →</Text>
+              </View>
+            </View>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+const s = StyleSheet.create({
+  page: { flex: 1, backgroundColor: colors.cream },
+  header: {
+    marginHorizontal: spacing.lg,
+    paddingVertical: 14,
+    borderBottomWidth: 2,
+    borderColor: colors.ink,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
+  back: { fontSize: 26, color: colors.ink },
+  kicker: {
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.4,
+    color: colors.green,
+  },
+  title: { fontSize: 28, fontWeight: "900", color: colors.ink },
+  step: { marginLeft: "auto", fontSize: 11, color: colors.muted },
+  found: {
+    marginHorizontal: spacing.lg,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 18,
+    paddingVertical: 8,
+  },
+  foundCopy: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: "700",
+    color: colors.muted,
+  },
+  list: { paddingHorizontal: spacing.lg, paddingBottom: 24 },
+  row: {
+    flexDirection: "row",
+    paddingVertical: 18,
+    borderTopWidth: 1,
+    borderColor: colors.line,
+  },
+  pressed: { opacity: 0.6 },
+  rank: { width: 34, fontSize: 11, fontWeight: "900", color: colors.gold },
+  body: { flex: 1 },
+  stockHead: { flexDirection: "row" },
+  ticker: { fontSize: 25, fontWeight: "900", color: colors.ink },
+  company: { fontSize: 12, color: colors.muted },
+  score: { marginLeft: "auto", alignItems: "flex-end" },
+  scoreValue: { fontSize: 26, fontWeight: "900", color: colors.green },
+  scoreLabel: { fontSize: 9, fontWeight: "900", color: colors.muted },
+  reason: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.ink,
+    fontWeight: "700",
+    marginTop: 12,
+  },
+  risk: { flexDirection: "row", alignItems: "center", gap: 7, marginTop: 9 },
+  riskMark: {
+    width: 20,
+    height: 20,
+    textAlign: "center",
+    lineHeight: 20,
+    borderRadius: 10,
+    backgroundColor: colors.danger,
+    color: colors.paper,
+    fontWeight: "900",
+  },
+  riskText: { fontSize: 11, color: colors.danger, fontWeight: "700" },
+  open: {
+    marginLeft: "auto",
+    fontSize: 11,
+    color: colors.green,
+    fontWeight: "900",
+  },
+});

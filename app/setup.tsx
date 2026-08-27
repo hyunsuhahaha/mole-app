@@ -1,6 +1,220 @@
-import{useState}from'react';import{SafeAreaView}from'react-native-safe-area-context';import{ScrollView,View,Text,Pressable,StyleSheet}from'react-native';import{router}from'expo-router';import{useDigStore,Filters}from'../src/store/useDigStore';import{PrimaryButton}from'../src/components/PrimaryButton';import{colors,spacing}from'../src/theme/tokens';
-const basic:[keyof Filters,string,string[]][]=[['style','투자 성향',['성장주','우량주','가치주']],['industry','산업',['전체 산업','기술','헬스케어']],['cap','시가총액',['3억–20억 달러','20억–500억 달러','500억 달러 이상']],['growth','매출 성장률',['10% 이상','15% 이상','25% 이상']],['horizon','투자 기간',['1–2년','3–5년','5년 이상']]];
-const advanced:[keyof Filters,string,string[]][]=[['lossAllowed','적자 기업',['적자 허용','흑자 전환 임박만','적자 제외']],['dilution','최근 증자',['심한 희석 제외','보통까지 허용','제한 없음']],['runup','최근 1년 급등',['급등 종목 제외','200% 이상만 제외','제한 없음']],['cashRunway','현금 버팀 기간',['18개월 이상','12개월 이상','제한 없음']],['catalyst','향후 12개월 촉매',['촉매 필수','있으면 가점','제한 없음']]];
-function ChoiceGroup({item,index}:{item:[keyof Filters,string,string[]];index:number}){const[key,label,options]=item,filters=useDigStore(x=>x.filters),setFilter=useDigStore(x=>x.setFilter);return <View style={s.group}><View style={s.labelRow}><Text style={s.number}>{String(index).padStart(2,'0')}</Text><Text style={s.label}>{label}</Text></View><View style={s.options}>{options.map(option=>{const selected=filters[key]===option;return <Pressable key={option} onPress={()=>setFilter(key,option)} style={[s.option,selected&&s.selected]}><Text style={[s.optionText,selected&&s.selectedText]}>{option}</Text>{selected&&<Text style={s.check}>●</Text>}</Pressable>})}</View></View>}
-export default function Setup(){const[deep,setDeep]=useState(false);return <SafeAreaView style={s.page}><View style={s.header}><Pressable accessibilityLabel="뒤로 가기" onPress={()=>router.back()} hitSlop={12}><Text style={s.back}>←</Text></Pressable><View><Text style={s.kicker}>발굴 계획</Text><Text style={s.title}>탈락 기준을 정하세요</Text></View><Text style={s.step}>01 / 04</Text></View><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.content}><Text style={s.intro}>무엇을 찾을지보다 무엇을 버릴지 먼저 정합니다.</Text>{basic.map((item,i)=><ChoiceGroup key={item[0]} item={item} index={i+1}/>)}<Pressable style={s.deepButton} onPress={()=>setDeep(x=>!x)}><View><Text style={s.deepKicker}>고급 탈락 조건</Text><Text style={s.deepTitle}>{deep?'얕게 보기':'더 깊게 파기'}</Text></View><Text style={s.deepArrow}>{deep?'↑':'↓'}</Text></Pressable>{deep&&<View style={s.deepArea}><Text style={s.deepNotice}>조건이 강할수록 후보는 줄지만 놓치는 종목도 생길 수 있어요.</Text>{advanced.map((item,i)=><ChoiceGroup key={item[0]} item={item} index={basic.length+i+1}/>)}</View>}</ScrollView><PrimaryButton label="이 조건으로 발굴" onPress={()=>router.push('/digging')}/></SafeAreaView>}
-const s=StyleSheet.create({page:{flex:1,backgroundColor:colors.cream,padding:spacing.lg},header:{flexDirection:'row',alignItems:'center',gap:16,paddingBottom:16,borderBottomWidth:2,borderColor:colors.ink},back:{fontSize:28,color:colors.ink},kicker:{fontSize:10,fontWeight:'900',letterSpacing:1.8,color:colors.green},title:{fontSize:24,fontWeight:'900',color:colors.ink},step:{marginLeft:'auto',fontSize:11,fontWeight:'800',color:colors.muted},content:{paddingBottom:24},intro:{fontSize:13,lineHeight:20,color:colors.muted,paddingVertical:16},group:{paddingVertical:16,borderBottomWidth:1,borderColor:colors.line},labelRow:{flexDirection:'row',alignItems:'center',marginBottom:11},number:{fontSize:11,color:colors.gold,fontWeight:'900',width:28},label:{fontSize:15,fontWeight:'800',color:colors.ink},options:{flexDirection:'row',flexWrap:'wrap',gap:8},option:{minHeight:42,paddingHorizontal:13,borderWidth:1,borderColor:colors.line,borderRadius:10,flexDirection:'row',alignItems:'center',gap:8,backgroundColor:colors.paper},selected:{backgroundColor:colors.ink,borderColor:colors.ink},optionText:{fontSize:13,fontWeight:'700',color:colors.muted},selectedText:{color:colors.paper},check:{fontSize:8,color:colors.goldLight},deepButton:{marginTop:20,backgroundColor:colors.soil,padding:18,borderRadius:14,flexDirection:'row',alignItems:'center'},deepKicker:{fontSize:10,color:colors.goldLight,fontWeight:'900',letterSpacing:1.2},deepTitle:{fontSize:20,color:colors.paper,fontWeight:'900',marginTop:3},deepArrow:{marginLeft:'auto',fontSize:24,color:colors.goldLight},deepArea:{borderLeftWidth:3,borderColor:colors.gold,paddingLeft:14},deepNotice:{fontSize:12,lineHeight:18,color:colors.muted,paddingVertical:14}});
+import { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+import { router } from "expo-router";
+import { useDigStore, Filters } from "../src/store/useDigStore";
+import { PrimaryButton } from "../src/components/PrimaryButton";
+import { colors, spacing } from "../src/theme/tokens";
+const basic: [keyof Filters, string, string[]][] = [
+  [
+    "style",
+    "어떤 회사를 찾을까요?",
+    ["빠르게 크는 회사", "꾸준히 버는 회사", "가격이 싼 회사"],
+  ],
+  ["industry", "관심 있는 분야", ["모두 보기", "기술", "헬스케어"]],
+  ["cap", "회사 크기", ["작은 회사", "중간 회사", "큰 회사"]],
+  ["growth", "매출이 얼마나 늘었나요?", ["10% 이상", "15% 이상", "25% 이상"]],
+  ["horizon", "얼마나 오래 볼까요?", ["1–2년", "3–5년", "5년 이상"]],
+];
+const advanced: [keyof Filters, string, string[]][] = [
+  ["lossAllowed", "적자 회사도 볼까요?", ["포함", "곧 흑자만", "제외"]],
+  [
+    "dilution",
+    "주식 수를 자주 늘린 회사",
+    ["많이 늘리면 제외", "조금은 허용", "상관없음"],
+  ],
+  [
+    "runup",
+    "최근 너무 오른 종목",
+    ["급등하면 제외", "200% 이상만 제외", "상관없음"],
+  ],
+  [
+    "cashRunway",
+    "현금으로 버틸 수 있는 기간",
+    ["18개월 이상", "12개월 이상", "상관없음"],
+  ],
+  [
+    "catalyst",
+    "앞으로 중요한 일정",
+    ["꼭 있어야 함", "있으면 가점", "상관없음"],
+  ],
+];
+function ChoiceGroup({
+  item,
+  index,
+}: {
+  item: [keyof Filters, string, string[]];
+  index: number;
+}) {
+  const [key, label, options] = item,
+    filters = useDigStore((x) => x.filters),
+    setFilter = useDigStore((x) => x.setFilter);
+  return (
+    <View style={s.group}>
+      <View style={s.labelRow}>
+        <Text style={s.number}>{String(index).padStart(2, "0")}</Text>
+        <Text style={s.label}>{label}</Text>
+      </View>
+      <View style={s.options}>
+        {options.map((option) => {
+          const selected = filters[key] === option;
+          return (
+            <Pressable
+              key={option}
+              onPress={() => setFilter(key, option)}
+              style={[s.option, selected && s.selected]}
+            >
+              <Text style={[s.optionText, selected && s.selectedText]}>
+                {option}
+              </Text>
+              {selected && <Text style={s.check}>●</Text>}
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+export default function Setup() {
+  const [deep, setDeep] = useState(false);
+  return (
+    <SafeAreaView style={s.page}>
+      <View style={s.header}>
+        <Pressable
+          accessibilityLabel="뒤로 가기"
+          onPress={() => router.back()}
+          hitSlop={12}
+        >
+          <Text style={s.back}>←</Text>
+        </Pressable>
+        <View>
+          <Text style={s.kicker}>쉬운 조건 고르기</Text>
+          <Text style={s.title}>원하는 종목을 골라볼까요?</Text>
+        </View>
+        <Text style={s.step}>01 / 04</Text>
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={s.content}
+      >
+        <Text style={s.intro}>
+          뜻을 몰라도 괜찮아요. 기본값 그대로 시작해도 됩니다.
+        </Text>
+        {basic.map((item, i) => (
+          <ChoiceGroup key={item[0]} item={item} index={i + 1} />
+        ))}
+        <Pressable style={s.deepButton} onPress={() => setDeep((x) => !x)}>
+          <View>
+            <Text style={s.deepKicker}>선택사항</Text>
+            <Text style={s.deepTitle}>
+              {deep ? "간단히 보기" : "더 꼼꼼히 고르기"}
+            </Text>
+          </View>
+          <Text style={s.deepArrow}>{deep ? "↑" : "↓"}</Text>
+        </Pressable>
+        {deep && (
+          <View style={s.deepArea}>
+            <Text style={s.deepNotice}>
+              조건을 많이 넣으면 후보가 줄고 좋은 종목을 놓칠 수도 있어요.
+            </Text>
+            {advanced.map((item, i) => (
+              <ChoiceGroup
+                key={item[0]}
+                item={item}
+                index={basic.length + i + 1}
+              />
+            ))}
+          </View>
+        )}
+      </ScrollView>
+      <PrimaryButton
+        label="두더지에게 맡기기"
+        onPress={() => router.push("/digging")}
+      />
+    </SafeAreaView>
+  );
+}
+const s = StyleSheet.create({
+  page: { flex: 1, backgroundColor: colors.cream, padding: spacing.lg },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 2,
+    borderColor: colors.ink,
+  },
+  back: { fontSize: 28, color: colors.ink },
+  kicker: {
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.8,
+    color: colors.green,
+  },
+  title: { fontSize: 24, fontWeight: "900", color: colors.ink },
+  step: {
+    marginLeft: "auto",
+    fontSize: 11,
+    fontWeight: "800",
+    color: colors.muted,
+  },
+  content: { paddingBottom: 24 },
+  intro: {
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.muted,
+    paddingVertical: 16,
+  },
+  group: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+  },
+  labelRow: { flexDirection: "row", alignItems: "center", marginBottom: 11 },
+  number: { fontSize: 11, color: colors.gold, fontWeight: "900", width: 28 },
+  label: { fontSize: 15, fontWeight: "800", color: colors.ink },
+  options: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  option: {
+    minHeight: 42,
+    paddingHorizontal: 13,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: colors.paper,
+  },
+  selected: { backgroundColor: colors.ink, borderColor: colors.ink },
+  optionText: { fontSize: 13, fontWeight: "700", color: colors.muted },
+  selectedText: { color: colors.paper },
+  check: { fontSize: 8, color: colors.goldLight },
+  deepButton: {
+    marginTop: 20,
+    backgroundColor: colors.soil,
+    padding: 18,
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  deepKicker: {
+    fontSize: 10,
+    color: colors.goldLight,
+    fontWeight: "900",
+    letterSpacing: 1.2,
+  },
+  deepTitle: {
+    fontSize: 20,
+    color: colors.paper,
+    fontWeight: "900",
+    marginTop: 3,
+  },
+  deepArrow: { marginLeft: "auto", fontSize: 24, color: colors.goldLight },
+  deepArea: { borderLeftWidth: 3, borderColor: colors.gold, paddingLeft: 14 },
+  deepNotice: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: colors.muted,
+    paddingVertical: 14,
+  },
+});

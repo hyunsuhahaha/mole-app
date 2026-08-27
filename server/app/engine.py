@@ -101,7 +101,7 @@ async def analyze_company(client: SecClient, ticker: str, cik: int) -> Metrics:
 
 
 def _money(value: float | None) -> str:
-    if value is None: return "공시값 없음"
+    if value is None: return "자료에 없음"
     if abs(value) >= 1_000_000_000: return f"${value / 1_000_000_000:.1f}B"
     return f"${value / 1_000_000:.0f}M"
 
@@ -111,17 +111,17 @@ def to_result(m: Metrics) -> dict[str, Any]:
     dilution = m.dilution or 0
     score = max(35, min(95, round(62 + growth * 0.55 - max(0, dilution) * 0.8 + (5 if (m.operating_income or 0) > 0 else 0))))
     risk_findings = []
-    if dilution > 5: risk_findings.append(f"최근 발행주식 증가 {dilution:.1f}%")
-    if (m.operating_income or 0) < 0: risk_findings.append("최근 분기 영업적자")
-    if not risk_findings: risk_findings.append("공시 수치 외 사업 위험 추가 확인 필요")
+    if dilution > 5: risk_findings.append(f"1년 동안 주식 수가 {dilution:.1f}% 늘었어요")
+    if (m.operating_income or 0) < 0: risk_findings.append("최근 3개월은 영업 손실이에요")
+    if not risk_findings: risk_findings.append("숫자에 나오지 않는 사업 위험도 확인해야 해요")
     return {
         "ticker":m.ticker,"company":m.company,"score":max(0,score-len(risk_findings)*3),"preRiskScore":score,
-        "reason":f"최근 분기 매출 성장률 {growth:.1f}%와 공시 재무상태를 통과",
-        "risk":risk_findings[0],"whyFound":f"SEC 공시 기준 최근 분기 매출이 전년 동기보다 {growth:.1f}% 성장했어요.",
-        "strongestCase":f"현금 및 현금성 자산 {_money(m.cash)}가 공시에서 확인돼요.",
-        "penalty":f"희석률 {dilution:.1f}%와 영업손익을 반영해 점수를 조정했어요.",
-        "reversalEvent":"다음 분기 매출 성장 둔화, 현금 급감 또는 큰 증자가 확인되면 판단이 바뀔 수 있어요.",
-        "evidence":[{"label":"현금 및 현금성 자산","value":_money(m.cash),"source":m.filing_label or "SEC EDGAR","sourceType":"10-Q","url":m.filing_url}],
+        "reason":f"최근 매출이 {growth:.1f}% 늘었고 회사 자료도 확인했어요",
+        "risk":risk_findings[0],"whyFound":f"최근 3개월 매출이 1년 전보다 {growth:.1f}% 늘었어요.",
+        "strongestCase":f"회사가 가진 현금 {_money(m.cash)}를 실제 자료에서 확인했어요.",
+        "penalty":f"주식 수 변화 {dilution:.1f}%와 회사가 돈을 벌고 있는지를 점수에 반영했어요.",
+        "reversalEvent":"다음 매출이 둔화되거나 현금이 크게 줄거나 주식 수가 많이 늘면 다시 봐야 해요.",
+        "evidence":[{"label":"회사가 가진 현금","value":_money(m.cash),"source":m.filing_label or "SEC EDGAR","sourceType":"10-Q","url":m.filing_url}],
         "riskFindings":risk_findings,"dataSource":"SEC EDGAR","asOf":m.filing_label,
     }
 
@@ -136,9 +136,9 @@ async def run_dig(client: SecClient, growth_min: float = 10, dilution_max: float
     dilution_pass = [x for x in growth_pass if x.dilution is None or x.dilution <= dilution_max]
     ranked = sorted((to_result(x) for x in dilution_pass), key=lambda x:x["score"], reverse=True)[:5]
     stages = [
-        {"count":len(available),"label":"SEC 공시 조회 완료","removed":len(CANDIDATES)-len(available),"explanation":"선정된 실데이터 검증 유니버스의 최신 SEC 공시를 불러왔어요.","rejected":[]},
-        {"count":len(growth_pass),"label":"실제 매출 성장률 필터","removed":len(available)-len(growth_pass),"explanation":f"전년 동기 대비 매출 성장률 {growth_min:.0f}% 미만을 제외했어요.","rejected":[{"ticker":x.ticker,"reason":f"매출 성장률 {x.revenue_growth:.1f}%" if x.revenue_growth is not None else "비교 가능한 분기 공시 없음"} for x in available if x not in growth_pass][:3]},
-        {"count":len(dilution_pass),"label":"실제 희석 위험 필터","removed":len(growth_pass)-len(dilution_pass),"explanation":f"발행주식 증가율 {dilution_max:.0f}% 초과 종목을 제외했어요.","rejected":[{"ticker":x.ticker,"reason":f"발행주식 증가율 {x.dilution:.1f}%"} for x in growth_pass if x not in dilution_pass][:3]},
-        {"count":len(ranked),"label":"SEC 원문 근거 교차검증","removed":max(0,len(dilution_pass)-len(ranked)),"explanation":"최신 10-Q/10-K 원문 링크가 있는 상위 종목을 남겼어요.","rejected":[]},
+        {"count":len(available),"label":"회사 자료 확인","removed":len(CANDIDATES)-len(available),"explanation":"회사가 미국 정부에 낸 최신 자료를 불러왔어요.","rejected":[]},
+        {"count":len(growth_pass),"label":"매출이 잘 늘었나","removed":len(available)-len(growth_pass),"explanation":f"최근 매출이 1년 전보다 {growth_min:.0f}% 이상 늘지 않은 회사를 뺐어요.","rejected":[{"ticker":x.ticker,"reason":f"매출 증가 {x.revenue_growth:.1f}%" if x.revenue_growth is not None else "비교할 최신 자료가 없어요"} for x in available if x not in growth_pass][:3]},
+        {"count":len(dilution_pass),"label":"주식 수를 너무 늘렸나","removed":len(growth_pass)-len(dilution_pass),"explanation":f"1년 동안 주식 수가 {dilution_max:.0f}% 넘게 늘어난 회사를 뺐어요.","rejected":[{"ticker":x.ticker,"reason":f"주식 수가 {x.dilution:.1f}% 늘었어요"} for x in growth_pass if x not in dilution_pass][:3]},
+        {"count":len(ranked),"label":"회사 자료로 다시 확인","removed":max(0,len(dilution_pass)-len(ranked)),"explanation":"숫자의 출처를 확인할 수 있는 회사만 남겼어요.","rejected":[]},
     ]
-    return {"results":ranked,"stages":stages,"source":"SEC EDGAR","scope":f"검증 유니버스 {len(CANDIDATES)}개 종목","unsupported":["실시간 주가","시가총액","1년 수익률","향후 촉매"]}
+    return {"results":ranked,"stages":stages,"source":"미국 SEC 자료","scope":f"먼저 확인하는 회사 {len(CANDIDATES)}개","unsupported":["실시간 주가","회사 크기","1년 주가 변화","앞으로의 주요 일정"]}
