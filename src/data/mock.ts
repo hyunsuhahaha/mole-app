@@ -1,5 +1,5 @@
-export type Evidence = { label:string; value:string; source:string; sourceType:'10-Q'|'Earnings'|'Filing'|'Clinical' };
-export type StockResult = { ticker:string; company:string; score:number; preRiskScore:number; reason:string; risk:string; whyFound:string; strongestCase:string; penalty:string; reversalEvent:string; evidence:Evidence[]; riskFindings:string[] };
+export type Evidence = { label:string; value:string; source:string; sourceType:'10-Q'|'Earnings'|'Filing'|'Clinical'; url?:string|null };
+export type StockResult = { ticker:string; company:string; score:number; preRiskScore:number; reason:string; risk:string; whyFound:string; strongestCase:string; penalty:string; reversalEvent:string; evidence:Evidence[]; riskFindings:string[]; dataSource?:string; asOf?:string };
 export type DigStage = { count:number; label:string; removed:number; explanation:string; rejected:{ticker:string;reason:string}[] };
 
 export const stages:DigStage[]=[

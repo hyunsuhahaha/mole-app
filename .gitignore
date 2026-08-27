@@ -9,6 +9,9 @@ dist/
 dist-android/
 dist-ios/
 build-apk/
+__pycache__/
+*.py[cod]
+.venv/
 build/
 .next/
 
