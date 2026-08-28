@@ -83,7 +83,9 @@ export default function InvestorDetail() {
           <View style={s.lensGrid}>
             {investor.lens.map((item, index) => (
               <View key={item} style={s.lensItem}>
-                <Text style={s.lensNumber}>{String(index + 1).padStart(2, "0")}</Text>
+                <Text style={s.lensNumber}>
+                  {String(index + 1).padStart(2, "0")}
+                </Text>
                 <Text style={s.lensText}>{item}</Text>
               </View>
             ))}
@@ -137,10 +139,15 @@ export default function InvestorDetail() {
           <Text style={s.holdingsNote}>{investor.holdingsNote}</Text>
           <View style={s.holdings}>
             {investor.holdings.map((holding) => (
-              <View key={`${holding.ticker}-${holding.company}`} style={s.holding}>
+              <View
+                key={`${holding.ticker}-${holding.company}`}
+                style={s.holding}
+              >
                 <Text style={s.ticker}>{holding.ticker}</Text>
                 <Text style={s.company}>{holding.company}</Text>
-                {holding.weight && <Text style={s.weight}>{holding.weight}</Text>}
+                {holding.weight && (
+                  <Text style={s.weight}>{holding.weight}</Text>
+                )}
               </View>
             ))}
           </View>
@@ -156,7 +163,8 @@ export default function InvestorDetail() {
         <View style={s.warning}>
           <Text style={s.warningTitle}>보유 종목은 추천 종목이 아니에요.</Text>
           <Text style={s.warningText}>
-            공개 시점 이후 매매했을 수 있고, 실제 포트폴리오 전체와 다를 수 있어요.
+            공개 시점 이후 매매했을 수 있고, 실제 포트폴리오 전체와 다를 수
+            있어요.
           </Text>
         </View>
 
@@ -181,21 +189,60 @@ const s = StyleSheet.create({
     borderColor: colors.line,
   },
   back: { fontSize: 27, color: colors.ink },
-  headerTitle: { fontSize: 14, fontWeight: "900", color: colors.ink, marginLeft: 14 },
+  headerTitle: {
+    fontSize: 14,
+    fontWeight: "900",
+    color: colors.ink,
+    marginLeft: 14,
+  },
   asOf: { marginLeft: "auto", fontSize: 9, color: colors.muted },
   content: { padding: spacing.lg, paddingBottom: 48 },
-  identity: { borderBottomWidth: 3, borderColor: colors.ink, paddingBottom: 16 },
-  name: { fontSize: 38, lineHeight: 42, fontWeight: "900", color: colors.ink, letterSpacing: -1.2 },
+  identity: {
+    borderBottomWidth: 3,
+    borderColor: colors.ink,
+    paddingBottom: 16,
+  },
+  name: {
+    fontSize: 38,
+    lineHeight: 42,
+    fontWeight: "900",
+    color: colors.ink,
+    letterSpacing: -1.2,
+  },
   nameEn: { fontSize: 12, color: colors.muted, marginTop: 2 },
-  vehicle: { fontSize: 11, fontWeight: "800", color: colors.green, marginTop: 8 },
-  style: { fontSize: 20, lineHeight: 27, fontWeight: "900", color: colors.ink, marginTop: 20 },
+  vehicle: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: colors.green,
+    marginTop: 8,
+  },
+  style: {
+    fontSize: 20,
+    lineHeight: 27,
+    fontWeight: "900",
+    color: colors.ink,
+    marginTop: 20,
+  },
   summary: { fontSize: 14, lineHeight: 21, color: colors.muted, marginTop: 8 },
   performance: { flexDirection: "row", gap: 8, marginTop: 20 },
-  metric: { flex: 1, backgroundColor: colors.paper, padding: 10, minHeight: 76, justifyContent: "space-between", borderRadius: 10 },
+  metric: {
+    flex: 1,
+    backgroundColor: colors.paper,
+    padding: 10,
+    minHeight: 76,
+    justifyContent: "space-between",
+    borderTopWidth: 2,
+    borderColor: colors.gold,
+  },
   metricValue: { fontSize: 19, fontWeight: "900", color: colors.green },
   metricNegative: { color: colors.danger },
   metricLabel: { fontSize: 8, lineHeight: 11, color: colors.muted },
-  performanceNote: { fontSize: 9, lineHeight: 14, color: colors.muted, marginTop: 9 },
+  performanceNote: {
+    fontSize: 9,
+    lineHeight: 14,
+    color: colors.muted,
+    marginTop: 9,
+  },
   sourceLink: { alignSelf: "flex-start", paddingVertical: 10 },
   sourceLinkText: { fontSize: 11, color: colors.green, fontWeight: "900" },
   pressed: { opacity: 0.55 },
@@ -203,31 +250,93 @@ const s = StyleSheet.create({
   sectionHead: { flexDirection: "row", alignItems: "center" },
   sectionTitle: { fontSize: 16, fontWeight: "900", color: colors.ink },
   lensGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
-  lensItem: { width: "48%", minHeight: 72, padding: 12, backgroundColor: colors.paper, borderRadius: 10 },
+  lensItem: {
+    width: "48%",
+    minHeight: 72,
+    padding: 12,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+  },
   lensNumber: { fontSize: 9, color: colors.gold, fontWeight: "900" },
-  lensText: { fontSize: 13, lineHeight: 18, color: colors.ink, fontWeight: "800", marginTop: 7 },
+  lensText: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.ink,
+    fontWeight: "800",
+    marginTop: 7,
+  },
   tags: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
-  tag: { fontSize: 11, color: colors.green, fontWeight: "800", backgroundColor: "#E0E4D5", paddingHorizontal: 10, paddingVertical: 7, borderRadius: 8 },
-  ideasIntro: { fontSize: 10, lineHeight: 15, color: colors.muted, marginTop: 6 },
+  tag: {
+    fontSize: 11,
+    color: colors.green,
+    fontWeight: "800",
+    backgroundColor: "#E0E4D5",
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 1,
+  },
+  ideasIntro: {
+    fontSize: 10,
+    lineHeight: 15,
+    color: colors.muted,
+    marginTop: 6,
+  },
   ideas: { marginTop: 12, gap: 10 },
-  idea: { backgroundColor: colors.paper, padding: 14, borderRadius: 10 },
+  idea: {
+    backgroundColor: colors.paper,
+    padding: 14,
+    borderLeftWidth: 3,
+    borderColor: colors.gold,
+  },
   ideaMeta: { flexDirection: "row", alignItems: "center" },
   ideaType: { fontSize: 9, fontWeight: "900", color: colors.green },
   ideaDate: { marginLeft: "auto", fontSize: 9, color: colors.muted },
-  ideaTitle: { fontSize: 15, lineHeight: 20, fontWeight: "900", color: colors.ink, marginTop: 9 },
-  ideaSummary: { fontSize: 11, lineHeight: 17, color: colors.muted, marginTop: 6 },
+  ideaTitle: {
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "900",
+    color: colors.ink,
+    marginTop: 9,
+  },
+  ideaSummary: {
+    fontSize: 11,
+    lineHeight: 17,
+    color: colors.muted,
+    marginTop: 6,
+  },
   ideaBottom: { flexDirection: "row", alignItems: "center", marginTop: 12 },
   ideaRelated: { flex: 1, fontSize: 9, color: colors.green, fontWeight: "800" },
   ideaOpen: { fontSize: 10, color: colors.green, fontWeight: "900" },
   holdingsDate: { marginLeft: "auto", fontSize: 9, color: colors.muted },
-  holdingsNote: { fontSize: 10, lineHeight: 15, color: colors.muted, marginTop: 6 },
+  holdingsNote: {
+    fontSize: 10,
+    lineHeight: 15,
+    color: colors.muted,
+    marginTop: 6,
+  },
   holdings: { marginTop: 12, borderTopWidth: 1, borderColor: colors.line },
-  holding: { minHeight: 46, flexDirection: "row", alignItems: "center", borderBottomWidth: 1, borderColor: colors.line },
+  holding: {
+    minHeight: 46,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+  },
   ticker: { width: 58, fontSize: 15, fontWeight: "900", color: colors.green },
   company: { flex: 1, fontSize: 12, fontWeight: "700", color: colors.ink },
   weight: { fontSize: 11, fontWeight: "900", color: colors.muted },
-  warning: { padding: 16, backgroundColor: "#EBD9CC", borderLeftWidth: 4, borderColor: colors.danger },
+  warning: {
+    padding: 16,
+    backgroundColor: "#EBD9CC",
+    borderLeftWidth: 4,
+    borderColor: colors.danger,
+  },
   warningTitle: { fontSize: 12, fontWeight: "900", color: colors.danger },
-  warningText: { fontSize: 10, lineHeight: 15, color: colors.muted, marginTop: 5 },
+  warningText: {
+    fontSize: 10,
+    lineHeight: 15,
+    color: colors.muted,
+    marginTop: 5,
+  },
   cta: { marginTop: 22 },
 });

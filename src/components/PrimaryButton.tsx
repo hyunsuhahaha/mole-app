@@ -1,5 +1,5 @@
 import { Pressable, Text, StyleSheet, ViewStyle } from "react-native";
-import { colors } from "../theme/tokens";
+import { colors, fonts } from "../theme/tokens";
 export function PrimaryButton({
   label,
   onPress,
@@ -24,7 +24,7 @@ const s = StyleSheet.create({
   button: {
     minHeight: 58,
     backgroundColor: colors.ink,
-    borderRadius: 12,
+    borderRadius: 1,
     borderTopWidth: 3,
     borderColor: colors.gold,
     paddingHorizontal: 20,
@@ -36,7 +36,7 @@ const s = StyleSheet.create({
   text: {
     color: colors.paper,
     fontSize: 17,
-    fontWeight: "800",
+    fontFamily: fonts.bold,
     letterSpacing: 0.3,
   },
   arrow: { color: colors.goldLight, fontSize: 24 },

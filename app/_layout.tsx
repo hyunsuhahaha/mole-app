@@ -2,12 +2,25 @@ import { router, Stack, usePathname } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors } from "../src/theme/tokens";
+import { IBMPlexSansKR_400Regular } from "@expo-google-fonts/ibm-plex-sans-kr/400Regular";
+import { IBMPlexSansKR_500Medium } from "@expo-google-fonts/ibm-plex-sans-kr/500Medium";
+import { IBMPlexSansKR_600SemiBold } from "@expo-google-fonts/ibm-plex-sans-kr/600SemiBold";
+import { IBMPlexSansKR_700Bold } from "@expo-google-fonts/ibm-plex-sans-kr/700Bold";
+import { useFonts } from "expo-font";
+import { colors, fonts } from "../src/theme/tokens";
 const client = new QueryClient();
 export default function Layout() {
+  const [fontsLoaded] = useFonts({
+    IBMPlexSansKR_400Regular,
+    IBMPlexSansKR_500Medium,
+    IBMPlexSansKR_600SemiBold,
+    IBMPlexSansKR_700Bold,
+  });
   const pathname = usePathname();
   const showTabs =
     pathname === "/" || pathname === "/search" || pathname === "/results";
+  if (!fontsLoaded) return null;
+
   return (
     <QueryClientProvider client={client}>
       <StatusBar style="dark" />
@@ -110,6 +123,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gold,
   },
   icon: { fontSize: 19, lineHeight: 22, color: colors.muted },
-  label: { marginTop: 2, fontSize: 10, fontWeight: "900", color: colors.muted },
+  label: {
+    marginTop: 2,
+    fontSize: 10,
+    fontFamily: fonts.bold,
+    color: colors.muted,
+  },
   active: { color: colors.green },
 });

@@ -14,7 +14,10 @@ import { goBackOr } from "../src/navigation/goBackOr";
 export default function Investors() {
   const [period, setPeriod] = useState<PerformancePeriod>("fiveYear");
   const ranked = useMemo(
-    () => [...investors].sort((a, b) => b.performance[period] - a.performance[period]),
+    () =>
+      [...investors].sort(
+        (a, b) => b.performance[period] - a.performance[period],
+      ),
     [period],
   );
 
@@ -110,7 +113,9 @@ export default function Investors() {
                 </View>
                 <Text style={s.style}>{investor.style}</Text>
                 <View style={s.ideaPreview}>
-                  <Text style={s.ideaSource}>{investor.ideas[0].sourceType}</Text>
+                  <Text style={s.ideaSource}>
+                    {investor.ideas[0].sourceType}
+                  </Text>
                   <Text style={s.ideaTitle} numberOfLines={2}>
                     {investor.ideas[0].title}
                   </Text>
@@ -184,7 +189,7 @@ const s = StyleSheet.create({
     minHeight: 42,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 10,
+    borderRadius: 1,
     borderWidth: 1,
     borderColor: colors.line,
     backgroundColor: colors.paper,
@@ -205,7 +210,12 @@ const s = StyleSheet.create({
   noticeMark: { color: colors.gold, fontWeight: "900" },
   noticeText: { flex: 1, fontSize: 10, lineHeight: 15, color: colors.muted },
   list: { borderTopWidth: 1, borderColor: colors.line },
-  row: { flexDirection: "row", paddingVertical: 18, borderBottomWidth: 1, borderColor: colors.line },
+  row: {
+    flexDirection: "row",
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+  },
   rowPressed: { opacity: 0.62, transform: [{ translateY: 1 }] },
   rank: { width: 34, fontSize: 11, fontWeight: "900", color: colors.gold },
   rowBody: { flex: 1 },
@@ -218,7 +228,12 @@ const s = StyleSheet.create({
   returnNegative: { color: colors.danger },
   returnLabel: { fontSize: 8, color: colors.muted, textAlign: "right" },
   style: { fontSize: 13, fontWeight: "800", color: colors.ink, marginTop: 12 },
-  ideaPreview: { flexDirection: "row", alignItems: "flex-start", gap: 7, marginTop: 8 },
+  ideaPreview: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 7,
+    marginTop: 8,
+  },
   ideaSource: {
     fontSize: 8,
     fontWeight: "900",
@@ -226,10 +241,22 @@ const s = StyleSheet.create({
     backgroundColor: colors.soil,
     paddingHorizontal: 6,
     paddingVertical: 4,
-    borderRadius: 5,
+    borderRadius: 1,
   },
-  ideaTitle: { flex: 1, fontSize: 10, lineHeight: 15, color: colors.muted, fontWeight: "700" },
-  sectors: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 6, marginTop: 9 },
+  ideaTitle: {
+    flex: 1,
+    fontSize: 10,
+    lineHeight: 15,
+    color: colors.muted,
+    fontWeight: "700",
+  },
+  sectors: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 9,
+  },
   sector: {
     fontSize: 9,
     fontWeight: "800",
@@ -237,8 +264,19 @@ const s = StyleSheet.create({
     backgroundColor: "#E0E4D5",
     paddingHorizontal: 7,
     paddingVertical: 5,
-    borderRadius: 7,
+    borderRadius: 1,
   },
-  open: { marginLeft: "auto", fontSize: 9, fontWeight: "900", color: colors.green },
-  disclaimer: { fontSize: 10, lineHeight: 16, color: colors.muted, textAlign: "center", marginTop: 20 },
+  open: {
+    marginLeft: "auto",
+    fontSize: 9,
+    fontWeight: "900",
+    color: colors.green,
+  },
+  disclaimer: {
+    fontSize: 10,
+    lineHeight: 16,
+    color: colors.muted,
+    textAlign: "center",
+    marginTop: 20,
+  },
 });

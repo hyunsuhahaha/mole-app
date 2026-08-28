@@ -7,7 +7,12 @@ export function movingAverage(values: number[], period: number) {
   });
 }
 
-export function chartIndexFromX(locationX: number | undefined, left: number, width: number, length: number) {
+export function chartIndexFromX(
+  locationX: number | undefined,
+  left: number,
+  width: number,
+  length: number,
+) {
   if (!Number.isFinite(locationX) || width <= 0 || length <= 0) return null;
   const ratio = Math.max(0, Math.min(0.999, (locationX! - left) / width));
   return Math.min(length - 1, Math.floor(ratio * length));

@@ -10,7 +10,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export type MoleMood = "idle" | "digging" | "suspicious" | "danger" | "excited" | "found";
+export type MoleMood =
+  | "idle"
+  | "digging"
+  | "suspicious"
+  | "danger"
+  | "excited"
+  | "found";
 
 const images = {
   idle: require("../../assets/moles/mole-idle.png"),
@@ -30,7 +36,13 @@ const labels: Record<MoleMood, string> = {
   found: "회사를 찾아낸 두더지",
 };
 
-export function Mole({ mood = "idle", size = 180 }: { mood?: MoleMood; size?: number }) {
+export function Mole({
+  mood = "idle",
+  size = 180,
+}: {
+  mood?: MoleMood;
+  size?: number;
+}) {
   const motion = useSharedValue(0);
 
   useEffect(() => {
@@ -53,7 +65,13 @@ export function Mole({ mood = "idle", size = 180 }: { mood?: MoleMood; size?: nu
     const celebrating = mood === "found" || mood === "excited";
     return {
       transform: [
-        { translateY: digging ? motion.value * 5 : celebrating ? -motion.value * 3 : -motion.value * 1.5 },
+        {
+          translateY: digging
+            ? motion.value * 5
+            : celebrating
+              ? -motion.value * 3
+              : -motion.value * 1.5,
+        },
         { rotate: alert ? `${(motion.value - 0.5) * 3}deg` : "0deg" },
         { scale: celebrating ? 1 + motion.value * 0.025 : 1 },
       ],
@@ -61,13 +79,24 @@ export function Mole({ mood = "idle", size = 180 }: { mood?: MoleMood; size?: nu
   });
 
   return (
-    <View accessibilityLabel={labels[mood]} style={[styles.frame, { width: size, height: size }]}>
-      <Animated.Image source={images[mood]} resizeMode="contain" style={[styles.image, animatedStyle]} />
+    <View
+      accessibilityLabel={labels[mood]}
+      style={[styles.frame, { width: size, height: size }]}
+    >
+      <Animated.Image
+        source={images[mood]}
+        resizeMode="contain"
+        style={[styles.image, animatedStyle]}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  frame: { alignItems: "center", justifyContent: "center", overflow: "visible" },
+  frame: {
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "visible",
+  },
   image: { width: "100%", height: "100%" },
 });

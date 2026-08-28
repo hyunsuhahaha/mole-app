@@ -191,7 +191,9 @@ const s = StyleSheet.create({
   brief: {
     marginBottom: 12,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 1,
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
     backgroundColor: "#E8DDC6",
   },
   briefLabel: {
@@ -256,7 +258,7 @@ const s = StyleSheet.create({
     height: 20,
     textAlign: "center",
     lineHeight: 20,
-    borderRadius: 10,
+    borderRadius: 1,
     backgroundColor: colors.danger,
     color: colors.paper,
     fontWeight: "900",
@@ -271,7 +273,9 @@ const s = StyleSheet.create({
   missedBox: {
     marginTop: 10,
     padding: 11,
-    borderRadius: 10,
+    borderRadius: 1,
+    borderLeftWidth: 3,
+    borderColor: colors.danger,
     backgroundColor: "#EBD9CC",
   },
   missedTitle: { fontSize: 9, fontWeight: "900", color: colors.danger },

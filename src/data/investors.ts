@@ -67,8 +67,7 @@ export const investors: Investor[] = [
     ],
     holdingsAsOf: "2025-12-31",
     holdingsNote: "Berkshire 연차보고서에 공개된 주요 상장주식",
-    holdingsSource:
-      "https://www.berkshirehathaway.com/letters/2025ltr.pdf",
+    holdingsSource: "https://www.berkshirehathaway.com/letters/2025ltr.pdf",
     ideas: [
       {
         date: "2025-12-31",
@@ -98,8 +97,7 @@ export const investors: Investor[] = [
     },
     performanceNote:
       "Berkshire 주당 시장가치 기준입니다. 5년 값은 공식 연간 수익률로 계산했어요.",
-    performanceSource:
-      "https://www.berkshirehathaway.com/letters/2025ltr.pdf",
+    performanceSource: "https://www.berkshirehathaway.com/letters/2025ltr.pdf",
   },
   {
     id: "cathie-wood",
@@ -169,7 +167,12 @@ export const investors: Investor[] = [
     summary:
       "질 좋은 대형주를 적게 고르고, 경영과 자본 배분이 좋아질 여지를 살펴봐요.",
     sectors: ["기술", "금융", "소비자 서비스", "부동산"],
-    lens: ["예측 가능한 현금", "높은 진입장벽", "가격 결정력", "개선 가능한 경영"],
+    lens: [
+      "예측 가능한 현금",
+      "높은 진입장벽",
+      "가격 결정력",
+      "개선 가능한 경영",
+    ],
     filterPreset: {
       style: "꾸준히 버는 회사",
       cap: "큰 회사",
@@ -186,8 +189,7 @@ export const investors: Investor[] = [
     ],
     holdingsAsOf: "2026-02-28",
     holdingsNote: "Pershing Square 공식 팩트시트의 공개 포트폴리오",
-    holdingsSource:
-      "https://pershingsquareholdings.com/portfolio/",
+    holdingsSource: "https://pershingsquareholdings.com/portfolio/",
     ideas: [
       {
         date: "2025-11-18",
@@ -217,8 +219,7 @@ export const investors: Investor[] = [
       longTerm: "2012년 이후 연환산 NAV",
     },
     performanceNote: "Pershing Square Holdings NAV 기준입니다.",
-    performanceSource:
-      "https://pershingsquareholdings.com/performance/nav/",
+    performanceSource: "https://pershingsquareholdings.com/performance/nav/",
   },
   {
     id: "terry-smith",

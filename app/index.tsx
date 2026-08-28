@@ -12,7 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Mole } from "../src/components/Mole";
 import { researchApi, type StockSearchItem } from "../src/api/research";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, fonts, spacing } from "../src/theme/tokens";
 
 const lenses = [
   { mark: "↗", title: "빠르게 성장", copy: "매출이 실제로 크는 회사" },
@@ -56,7 +56,11 @@ export default function Home() {
         contentContainerStyle={[s.content, !compact && s.contentWide]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={s.greeting}>어떤 회사를{`\n`}찾아볼까요?</Text>
+        <View style={s.folio}>
+          <Text style={s.folioText}>FIELD NOTE · 001</Text>
+          <Text style={s.folioText}>NYSE / NASDAQ</Text>
+        </View>
+        <Text style={s.greeting}>시장 전체에서{`\n`}근거 있는 회사 찾기</Text>
         <Pressable
           accessibilityRole="search"
           onPress={() => router.push("/search")}
@@ -73,10 +77,12 @@ export default function Home() {
             <View style={[s.strataLine, s.strataThree]} />
           </View>
           <View style={s.digCopy}>
-            <Text style={s.panelKicker}>두더지에게 말해보세요</Text>
-            <Text style={s.panelTitle}>어려운 조건도{`\n`}쉬운 질문으로</Text>
+            <Text style={s.panelKicker}>SCREENING ROUTE / 01</Text>
+            <Text style={s.panelTitle}>
+              조건을 정하고{`\n`}시장 한 층씩 파기
+            </Text>
             <Text style={s.panelCopy}>
-              성향과 답변을 실제 회사 숫자로 바꿔 후보를 좁혀요.
+              답변을 실제 회사 숫자로 바꿔 탈락 과정과 남은 근거를 보여줘요.
             </Text>
             <Pressable
               accessibilityRole="button"
@@ -99,7 +105,7 @@ export default function Home() {
           </View>
         </View>
         <View style={s.sectionHead}>
-          <Text style={s.sectionTitle}>어떤 기준으로 볼까요?</Text>
+          <Text style={s.sectionTitle}>탐사 기준 / 03</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() =>
@@ -123,18 +129,16 @@ export default function Home() {
                 pressed && s.pressed,
               ]}
             >
-              <View style={[s.lensMarker, compact && s.lensMarkerCompact]}>
+              <View style={[s.lensMarker, s.lensMarkerCompact]}>
                 <Text style={s.lensMark}>{lens.mark}</Text>
               </View>
-              <View style={compact && s.lensBodyCompact}>
-                <Text style={[s.lensTitle, compact && s.lensTitleCompact]}>
+              <View style={s.lensBodyCompact}>
+                <Text style={[s.lensTitle, s.lensTitleCompact]}>
                   {lens.title}
                 </Text>
-                <Text style={[s.lensCopy, compact && s.lensCopyCompact]}>
-                  {lens.copy}
-                </Text>
+                <Text style={[s.lensCopy, s.lensCopyCompact]}>{lens.copy}</Text>
               </View>
-              {compact && <Text style={s.lensArrow}>→</Text>}
+              <Text style={s.lensArrow}>→</Text>
             </Pressable>
           ))}
         </View>
@@ -154,7 +158,7 @@ export default function Home() {
         )}
         <View style={s.sectionHead}>
           <View>
-            <Text style={s.sectionTitle}>숫자가 눈에 띄는 회사</Text>
+            <Text style={s.sectionTitle}>오늘의 관찰 목록</Text>
             <Text style={s.sectionSub}>
               흑자이면서 최근 매출이 늘어난 회사예요
             </Text>
@@ -259,7 +263,7 @@ const s = StyleSheet.create({
     width: 28,
     height: 28,
     marginRight: 9,
-    borderRadius: 9,
+    borderRadius: 1,
     backgroundColor: colors.ink,
     alignItems: "center",
     justifyContent: "center",
@@ -272,37 +276,56 @@ const s = StyleSheet.create({
   },
   brand: {
     fontSize: 13,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     letterSpacing: 2.1,
     color: colors.ink,
   },
-  brandSub: { marginTop: 1, fontSize: 8, color: colors.muted },
+  brandSub: {
+    marginTop: 1,
+    fontSize: 8,
+    fontFamily: fonts.regular,
+    color: colors.muted,
+  },
   profile: {
     minHeight: 32,
     marginLeft: "auto",
     paddingHorizontal: 10,
-    borderRadius: 9,
-    backgroundColor: "#E7DCC8",
+    borderLeftWidth: 1,
+    borderColor: colors.line,
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
   },
-  profileTitle: { fontSize: 9, fontWeight: "900", color: colors.green },
+  profileTitle: { fontSize: 9, fontFamily: fonts.bold, color: colors.green },
   profileArrow: { fontSize: 13, color: colors.green },
   content: { padding: spacing.lg, paddingTop: 21, paddingBottom: 40 },
   contentWide: { paddingHorizontal: spacing.xl, paddingTop: 28 },
+  folio: {
+    marginBottom: 14,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  folioText: {
+    fontSize: 8,
+    letterSpacing: 1.4,
+    fontFamily: fonts.semibold,
+    color: colors.muted,
+  },
   greeting: {
-    fontSize: 35,
-    lineHeight: 40,
+    fontSize: 34,
+    lineHeight: 41,
     letterSpacing: -1.2,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.ink,
   },
   search: {
     minHeight: 59,
     marginTop: 18,
     paddingHorizontal: 16,
-    borderRadius: 17,
+    borderRadius: 1,
     borderWidth: 2,
     borderColor: colors.ink,
     backgroundColor: colors.paper,
@@ -310,14 +333,21 @@ const s = StyleSheet.create({
     alignItems: "center",
   },
   searchIcon: { marginRight: 10, fontSize: 26, color: colors.green },
-  searchText: { flex: 1, fontSize: 14, fontWeight: "800", color: colors.muted },
-  searchHint: { fontSize: 8, fontWeight: "900", color: colors.gold },
+  searchText: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: fonts.semibold,
+    color: colors.muted,
+  },
+  searchHint: { fontSize: 8, fontFamily: fonts.bold, color: colors.gold },
   pressed: { opacity: 0.6, transform: [{ translateY: 1 }] },
   digPanel: {
     minHeight: 220,
     marginTop: 18,
     padding: 20,
-    borderRadius: 24,
+    borderRadius: 1,
+    borderLeftWidth: 5,
+    borderColor: colors.gold,
     backgroundColor: colors.soilDark,
     flexDirection: "row",
     overflow: "hidden",
@@ -344,7 +374,7 @@ const s = StyleSheet.create({
   digCopy: { flex: 1, zIndex: 1 },
   panelKicker: {
     fontSize: 9,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     letterSpacing: 1.1,
     color: colors.goldLight,
   },
@@ -352,7 +382,7 @@ const s = StyleSheet.create({
     marginTop: 8,
     fontSize: 25,
     lineHeight: 30,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.paper,
   },
   panelCopy: {
@@ -360,20 +390,25 @@ const s = StyleSheet.create({
     maxWidth: 190,
     fontSize: 10,
     lineHeight: 16,
+    fontFamily: fonts.regular,
     color: "#D4C1AE",
   },
   panelButton: {
     minHeight: 44,
     marginTop: 15,
     paddingHorizontal: 13,
-    borderRadius: 10,
+    borderRadius: 1,
     backgroundColor: colors.goldLight,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
   },
   panelButtonPressed: { transform: [{ translateY: 1 }], opacity: 0.8 },
-  panelButtonText: { fontSize: 11, fontWeight: "900", color: colors.soilDark },
+  panelButtonText: {
+    fontSize: 11,
+    fontFamily: fonts.bold,
+    color: colors.soilDark,
+  },
   panelButtonArrow: { marginLeft: 16, fontSize: 17, color: colors.soilDark },
   moleWrap: {
     width: 154,
@@ -389,15 +424,25 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
     gap: 12,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "900", color: colors.ink },
-  sectionSub: { marginTop: 3, fontSize: 9, color: colors.muted },
+  sectionTitle: { fontSize: 18, fontFamily: fonts.bold, color: colors.ink },
+  sectionSub: {
+    marginTop: 3,
+    fontSize: 9,
+    fontFamily: fonts.regular,
+    color: colors.muted,
+  },
   more: {
     paddingVertical: 3,
     fontSize: 9,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.green,
   },
-  lenses: { flexDirection: "row", gap: 8 },
+  lenses: {
+    flexDirection: "column",
+    gap: 0,
+    borderTopWidth: 2,
+    borderColor: colors.ink,
+  },
   lensesCompact: {
     flexDirection: "column",
     gap: 0,
@@ -405,13 +450,15 @@ const s = StyleSheet.create({
     borderColor: colors.ink,
   },
   lens: {
-    flex: 1,
-    minHeight: 112,
-    padding: 13,
-    borderRadius: 16,
-    backgroundColor: colors.paper,
-    borderTopWidth: 3,
-    borderColor: colors.gold,
+    flex: 0,
+    minHeight: 72,
+    paddingHorizontal: 2,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: "transparent",
+    flexDirection: "row",
+    alignItems: "center",
   },
   lensCompact: {
     flex: 0,
@@ -432,19 +479,26 @@ const s = StyleSheet.create({
     height: 34,
     minHeight: 34,
     marginRight: 13,
-    borderRadius: 10,
-    backgroundColor: "#E4D6BD",
+    borderRadius: 1,
+    borderWidth: 1,
+    borderColor: colors.line,
     alignItems: "center",
     justifyContent: "center",
   },
-  lensMark: { fontSize: 17, fontWeight: "900", color: colors.green },
+  lensMark: { fontSize: 17, fontFamily: fonts.bold, color: colors.green },
   lensTitle: {
     marginTop: 11,
     fontSize: 12,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.ink,
   },
-  lensCopy: { marginTop: 5, fontSize: 9, lineHeight: 13, color: colors.muted },
+  lensCopy: {
+    marginTop: 5,
+    fontSize: 9,
+    lineHeight: 13,
+    fontFamily: fonts.regular,
+    color: colors.muted,
+  },
   lensBodyCompact: { flex: 1 },
   lensTitleCompact: { marginTop: 0, fontSize: 13 },
   lensCopyCompact: { marginTop: 3, fontSize: 10, lineHeight: 14 },
@@ -453,8 +507,9 @@ const s = StyleSheet.create({
     minHeight: 64,
     marginTop: 19,
     paddingHorizontal: 16,
-    borderRadius: 14,
-    backgroundColor: "#E4D6BD",
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
+    backgroundColor: colors.paper,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",

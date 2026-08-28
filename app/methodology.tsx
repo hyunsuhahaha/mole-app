@@ -1,4 +1,11 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { goBackOr } from "../src/navigation/goBackOr";
 import { colors, spacing } from "../src/theme/tokens";
@@ -48,7 +55,10 @@ export default function Methodology() {
           <Text style={s.headerTitle}>데이터와 판단 기준</Text>
         </View>
       </View>
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+      >
         <Text style={s.title}>두더지가 보는 것과{`\n`}보지 못하는 것</Text>
         <Text style={s.intro}>
           Stock Digger는 매수 추천기가 아니라 조건에 맞는 회사를 좁혀보는 학습용
@@ -65,7 +75,11 @@ export default function Methodology() {
         ))}
         <Pressable
           accessibilityRole="link"
-          onPress={() => Linking.openURL("https://www.sec.gov/search-filings/edgar-application-programming-interfaces")}
+          onPress={() =>
+            Linking.openURL(
+              "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+            )
+          }
           style={s.source}
         >
           <Text style={s.sourceLabel}>공식 데이터 출처</Text>
@@ -83,20 +97,74 @@ export default function Methodology() {
 
 const s = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.cream },
-  header: { marginHorizontal: spacing.lg, minHeight: 70, borderBottomWidth: 2, borderColor: colors.ink, flexDirection: "row", alignItems: "center", gap: 14 },
+  header: {
+    marginHorizontal: spacing.lg,
+    minHeight: 70,
+    borderBottomWidth: 2,
+    borderColor: colors.ink,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
   back: { fontSize: 27, color: colors.ink },
-  kicker: { color: colors.green, fontSize: 10, fontWeight: "900", letterSpacing: 1.4 },
+  kicker: {
+    color: colors.green,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.4,
+  },
   headerTitle: { color: colors.ink, fontSize: 20, fontWeight: "900" },
   content: { padding: spacing.lg, paddingBottom: 40 },
-  title: { fontSize: 34, lineHeight: 39, letterSpacing: -1.2, fontWeight: "900", color: colors.ink },
-  intro: { marginTop: 13, marginBottom: 20, fontSize: 14, lineHeight: 21, color: colors.muted },
-  section: { paddingVertical: 17, borderTopWidth: 1, borderColor: colors.line, flexDirection: "row" },
+  title: {
+    fontSize: 34,
+    lineHeight: 39,
+    letterSpacing: -1.2,
+    fontWeight: "900",
+    color: colors.ink,
+  },
+  intro: {
+    marginTop: 13,
+    marginBottom: 20,
+    fontSize: 14,
+    lineHeight: 21,
+    color: colors.muted,
+  },
+  section: {
+    paddingVertical: 17,
+    borderTopWidth: 1,
+    borderColor: colors.line,
+    flexDirection: "row",
+  },
   number: { width: 34, color: colors.gold, fontSize: 10, fontWeight: "900" },
   sectionBody: { flex: 1 },
   sectionTitle: { color: colors.ink, fontSize: 15, fontWeight: "900" },
-  sectionText: { marginTop: 7, color: colors.muted, fontSize: 12, lineHeight: 19 },
-  source: { marginTop: 8, padding: 15, borderRadius: 12, backgroundColor: colors.soil, flexDirection: "row", alignItems: "center" },
+  sectionText: {
+    marginTop: 7,
+    color: colors.muted,
+    fontSize: 12,
+    lineHeight: 19,
+  },
+  source: {
+    marginTop: 8,
+    padding: 15,
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
+    backgroundColor: colors.soil,
+    flexDirection: "row",
+    alignItems: "center",
+  },
   sourceLabel: { color: colors.goldLight, fontSize: 10, fontWeight: "900" },
-  sourceText: { marginLeft: "auto", color: colors.paper, fontSize: 11, fontWeight: "800" },
-  disclaimer: { marginTop: 18, color: colors.danger, fontSize: 10, lineHeight: 16, fontWeight: "700" },
+  sourceText: {
+    marginLeft: "auto",
+    color: colors.paper,
+    fontSize: 11,
+    fontWeight: "800",
+  },
+  disclaimer: {
+    marginTop: 18,
+    color: colors.danger,
+    fontSize: 10,
+    lineHeight: 16,
+    fontWeight: "700",
+  },
 });

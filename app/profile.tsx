@@ -6,7 +6,7 @@ import { PrimaryButton } from "../src/components/PrimaryButton";
 import { calculateRiskProfile, riskQuestions } from "../src/data/riskProfile";
 import { goBackOr } from "../src/navigation/goBackOr";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, fonts, spacing } from "../src/theme/tokens";
 
 export default function Profile() {
   const { next } = useLocalSearchParams<{ next?: string }>();
@@ -159,10 +159,10 @@ const s = StyleSheet.create({
   kicker: {
     color: colors.green,
     fontSize: 10,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     letterSpacing: 1.4,
   },
-  headerTitle: { color: colors.ink, fontSize: 20, fontWeight: "900" },
+  headerTitle: { color: colors.ink, fontSize: 20, fontFamily: fonts.bold },
   progress: { marginLeft: "auto", fontSize: 11, color: colors.muted },
   progressTrack: {
     height: 3,
@@ -176,17 +176,23 @@ const s = StyleSheet.create({
     marginTop: 18,
     color: colors.green,
     fontSize: 10,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     letterSpacing: 1.3,
   },
   question: {
     marginTop: 9,
     fontSize: 31,
     lineHeight: 37,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.ink,
   },
-  help: { marginTop: 10, fontSize: 13, lineHeight: 20, color: colors.muted },
+  help: {
+    marginTop: 10,
+    fontSize: 13,
+    lineHeight: 20,
+    fontFamily: fonts.regular,
+    color: colors.muted,
+  },
   options: {
     marginTop: 25,
     borderTopWidth: 2,
@@ -205,16 +211,17 @@ const s = StyleSheet.create({
     width: 38,
     marginRight: 9,
     fontSize: 10,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.gold,
     fontVariant: ["tabular-nums"],
   },
   optionBody: { flex: 1 },
-  optionLabel: { fontSize: 14, fontWeight: "900", color: colors.ink },
+  optionLabel: { fontSize: 14, fontFamily: fonts.bold, color: colors.ink },
   optionNote: {
     marginTop: 5,
     fontSize: 11,
     lineHeight: 16,
+    fontFamily: fonts.regular,
     color: colors.muted,
   },
   arrow: { marginLeft: 10, color: colors.gold, fontSize: 20 },
@@ -224,20 +231,20 @@ const s = StyleSheet.create({
     marginTop: 9,
     fontSize: 39,
     lineHeight: 45,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.ink,
   },
   resultSummary: {
     marginTop: 13,
     fontSize: 16,
     lineHeight: 24,
-    fontWeight: "700",
+    fontFamily: fonts.semibold,
     color: colors.soil,
   },
   resultBox: {
     marginTop: 25,
     padding: 18,
-    borderRadius: 14,
+    borderRadius: 1,
     borderWidth: 2,
     borderColor: colors.green,
     backgroundColor: colors.paper,
@@ -252,7 +259,9 @@ const s = StyleSheet.create({
   notice: {
     marginTop: 13,
     padding: 15,
-    borderRadius: 12,
+    borderRadius: 1,
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
     backgroundColor: "#E8DDC6",
   },
   noticeTitle: { fontSize: 11, fontWeight: "900", color: colors.ink },

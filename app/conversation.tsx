@@ -22,7 +22,7 @@ import {
   type RuleBucket,
 } from "../src/data/screenerConversation";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, fonts, spacing } from "../src/theme/tokens";
 import { goBackOr } from "../src/navigation/goBackOr";
 import { intentOrderByRisk } from "../src/data/riskProfile";
 
@@ -47,7 +47,9 @@ export default function Conversation() {
   const orderedIntents = useMemo(() => {
     if (!riskProfile) return intents;
     const order = intentOrderByRisk[riskProfile.level];
-    return [...intents].sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    return [...intents].sort(
+      (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
+    );
   }, [riskProfile]);
   const questions = intent ? getQuestions(intent, answers) : [];
   const question = questions[step];
@@ -179,7 +181,9 @@ export default function Conversation() {
               <View style={s.options}>
                 <View style={s.profileStrip}>
                   <Text style={s.profileStripTitle}>{riskProfile.title}</Text>
-                  <Text style={s.profileStripText}>성향에 맞는 방향부터 보여드려요.</Text>
+                  <Text style={s.profileStripText}>
+                    성향에 맞는 방향부터 보여드려요.
+                  </Text>
                 </View>
                 {orderedIntents.map((item, index) => {
                   const recommended = suggestedIntent === item.id;
@@ -191,16 +195,21 @@ export default function Conversation() {
                       onPress={() => chooseIntent(item.id)}
                       style={({ pressed }) => [
                         s.intentOption,
-                        (recommended || profileRecommended) && s.recommendedOption,
+                        (recommended || profileRecommended) &&
+                          s.recommendedOption,
                         pressed && s.optionPressed,
                       ]}
                     >
                       <View style={s.intentBody}>
                         <View style={s.intentTitleRow}>
                           <Text style={s.optionText}>{item.title}</Text>
-                          {(recommended || profileRecommended) && <Text style={s.recommend}>성향 추천</Text>}
+                          {(recommended || profileRecommended) && (
+                            <Text style={s.recommend}>성향 추천</Text>
+                          )}
                         </View>
-                        <Text style={s.intentDescription}>{item.description}</Text>
+                        <Text style={s.intentDescription}>
+                          {item.description}
+                        </Text>
                       </View>
                       <Text style={s.optionArrow}>→</Text>
                     </Pressable>
@@ -221,10 +230,13 @@ export default function Conversation() {
               <Text style={s.title}>내가 찾는 주식</Text>
               <Text style={s.quote}>“{query}”</Text>
               <Text style={s.selectedIntent}>
-                선택한 방향 · {intents.find((item) => item.id === intent)?.title}
+                선택한 방향 ·{" "}
+                {intents.find((item) => item.id === intent)?.title}
               </Text>
               <View style={s.coverage}>
-                <Text style={s.coverageStrong}>{built.profile.answeredCount}개 질문 완료</Text>
+                <Text style={s.coverageStrong}>
+                  {built.profile.answeredCount}개 질문 완료
+                </Text>
                 <Text style={s.coverageText}>
                   {built.profile.unknownCount
                     ? `잘 모르겠다고 답한 ${built.profile.unknownCount}개 조건은 후보를 줄이지 않았어요.`
@@ -247,11 +259,14 @@ export default function Conversation() {
                 rules={built.profile.pending}
               />
               <View style={s.notice}>
-                <Text style={s.noticeTitle}>지금 검색에 바로 들어가는 조건</Text>
+                <Text style={s.noticeTitle}>
+                  지금 검색에 바로 들어가는 조건
+                </Text>
                 <Text style={s.noticeText}>
                   매출 성장률, 최근 영업 흑자와 주식 수 증가율은 SEC 회사 자료로
-                  거릅니다. 가격 조건은 시세 연결 시 계산하고, 자동으로 단정할 수
-                  없는 제품·고객·향후 사건은 후보 화면에서 확인 항목으로 보여줘요.
+                  거릅니다. 가격 조건은 시세 연결 시 계산하고, 자동으로 단정할
+                  수 없는 제품·고객·향후 사건은 후보 화면에서 확인 항목으로
+                  보여줘요.
                 </Text>
               </View>
               <Pressable
@@ -279,7 +294,10 @@ export default function Conversation() {
                     accessibilityRole="button"
                     key={item.value}
                     onPress={() => answer(item.value)}
-                    style={({ pressed }) => [s.option, pressed && s.optionPressed]}
+                    style={({ pressed }) => [
+                      s.option,
+                      pressed && s.optionPressed,
+                    ]}
                   >
                     <View style={s.intentBody}>
                       <Text style={s.optionText}>{item.label}</Text>
@@ -296,7 +314,9 @@ export default function Conversation() {
                 }
                 style={s.previous}
               >
-                <Text style={s.previousText}>{step ? "← 이전 질문" : "← 방향 다시 고르기"}</Text>
+                <Text style={s.previousText}>
+                  {step ? "← 이전 질문" : "← 방향 다시 고르기"}
+                </Text>
               </Pressable>
             </>
           )}
@@ -349,7 +369,9 @@ function RuleGroup({
       <View style={s.ruleBody}>
         <Text style={s.ruleLabel}>{label}</Text>
         {rules.map((rule) => (
-          <Text key={rule} style={s.ruleText}>• {rule}</Text>
+          <Text key={rule} style={s.ruleText}>
+            • {rule}
+          </Text>
         ))}
       </View>
     </View>
@@ -375,7 +397,7 @@ const s = StyleSheet.create({
     fontWeight: "900",
     letterSpacing: 1.4,
   },
-  headerTitle: { color: colors.ink, fontSize: 20, fontWeight: "900" },
+  headerTitle: { color: colors.ink, fontSize: 20, fontFamily: fonts.bold },
   progress: { marginLeft: "auto", fontSize: 11, color: colors.muted },
   content: { padding: spacing.lg, paddingBottom: 36 },
   title: {
@@ -383,7 +405,7 @@ const s = StyleSheet.create({
     fontSize: 37,
     lineHeight: 42,
     letterSpacing: -1.4,
-    fontWeight: "900",
+    fontFamily: fonts.bold,
     color: colors.ink,
   },
   copy: { marginTop: 14, fontSize: 14, lineHeight: 21, color: colors.muted },
@@ -391,7 +413,7 @@ const s = StyleSheet.create({
     marginTop: 24,
     padding: 16,
     minHeight: 150,
-    borderRadius: 16,
+    borderRadius: 1,
     borderWidth: 2,
     borderColor: colors.ink,
     backgroundColor: colors.paper,
@@ -410,7 +432,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.ink,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    borderRadius: 10,
+    borderRadius: 1,
   },
   sendDisabled: { opacity: 0.25 },
   sendText: { color: colors.paper, fontSize: 12, fontWeight: "900" },
@@ -429,8 +451,9 @@ const s = StyleSheet.create({
     maxWidth: "88%",
     marginTop: 12,
     padding: 14,
-    borderRadius: 15,
-    borderBottomRightRadius: 3,
+    borderRadius: 1,
+    borderRightWidth: 4,
+    borderColor: colors.gold,
     backgroundColor: colors.soil,
   },
   userBubbleText: { color: colors.paper, fontSize: 13, lineHeight: 19 },
@@ -449,7 +472,7 @@ const s = StyleSheet.create({
   supportBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 1,
     overflow: "hidden",
     fontSize: 8,
     fontWeight: "900",
@@ -465,31 +488,35 @@ const s = StyleSheet.create({
     color: colors.ink,
   },
   help: { marginTop: 8, fontSize: 13, lineHeight: 19, color: colors.muted },
-  options: { marginTop: 22, gap: 9 },
-  profileStrip: { marginTop: 16, padding: 12, borderRadius: 11, backgroundColor: "#E8DDC6" },
+  options: { marginTop: 22, borderTopWidth: 2, borderColor: colors.ink },
+  profileStrip: {
+    marginTop: 16,
+    padding: 12,
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
+    backgroundColor: "#E8DDC6",
+  },
   profileStripTitle: { color: colors.green, fontSize: 11, fontWeight: "900" },
   profileStripText: { marginTop: 3, color: colors.muted, fontSize: 10 },
   option: {
     minHeight: 57,
     paddingHorizontal: 17,
-    borderRadius: 13,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: colors.line,
-    backgroundColor: colors.paper,
+    backgroundColor: "transparent",
     flexDirection: "row",
     alignItems: "center",
   },
   intentOption: {
     minHeight: 76,
     paddingHorizontal: 17,
-    borderRadius: 13,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: colors.line,
-    backgroundColor: colors.paper,
+    backgroundColor: "transparent",
     flexDirection: "row",
     alignItems: "center",
   },
-  recommendedOption: { borderWidth: 2, borderColor: colors.green },
+  recommendedOption: { borderLeftWidth: 4, borderColor: colors.green },
   disabledOption: { opacity: 0.5, backgroundColor: "#E9E3D8" },
   intentBody: { flex: 1 },
   intentTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -497,7 +524,7 @@ const s = StyleSheet.create({
   recommend: {
     paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 7,
+    borderRadius: 1,
     overflow: "hidden",
     backgroundColor: colors.green,
     color: colors.paper,
@@ -527,11 +554,16 @@ const s = StyleSheet.create({
   coverage: {
     marginBottom: 12,
     padding: 13,
-    borderRadius: 11,
+    borderRadius: 1,
     backgroundColor: "#E8DDC6",
   },
   coverageStrong: { color: colors.ink, fontSize: 12, fontWeight: "900" },
-  coverageText: { marginTop: 4, color: colors.muted, fontSize: 10, lineHeight: 16 },
+  coverageText: {
+    marginTop: 4,
+    color: colors.muted,
+    fontSize: 10,
+    lineHeight: 16,
+  },
   editAnswers: { alignSelf: "flex-start", paddingVertical: 16 },
   ruleGroup: {
     paddingVertical: 15,
@@ -542,14 +574,26 @@ const s = StyleSheet.create({
   ruleMark: { width: 8, height: 8, borderRadius: 4, marginTop: 4 },
   ruleBody: { flex: 1, marginLeft: 11 },
   ruleLabel: { color: colors.muted, fontSize: 10, fontWeight: "900" },
-  ruleText: { marginTop: 6, color: colors.ink, fontSize: 13, fontWeight: "800" },
+  ruleText: {
+    marginTop: 6,
+    color: colors.ink,
+    fontSize: 13,
+    fontWeight: "800",
+  },
   notice: {
     marginTop: 12,
     padding: 15,
-    borderRadius: 12,
+    borderRadius: 1,
+    borderLeftWidth: 4,
+    borderColor: colors.gold,
     backgroundColor: "#E8DDC6",
   },
   noticeTitle: { color: colors.ink, fontSize: 12, fontWeight: "900" },
-  noticeText: { marginTop: 5, color: colors.muted, fontSize: 11, lineHeight: 17 },
+  noticeText: {
+    marginTop: 5,
+    color: colors.muted,
+    fontSize: 11,
+    lineHeight: 17,
+  },
   footer: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
 });
