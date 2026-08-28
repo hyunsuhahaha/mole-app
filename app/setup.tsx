@@ -4,7 +4,7 @@ import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useDigStore, Filters } from "../src/store/useDigStore";
 import { PrimaryButton } from "../src/components/PrimaryButton";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, radius, spacing } from "../src/theme/tokens";
 import { goBackOr } from "../src/navigation/goBackOr";
 const basic: [keyof Filters, string, string[]][] = [
   [
@@ -94,36 +94,26 @@ export default function Setup() {
         >
           <Text style={s.back}>←</Text>
         </Pressable>
-        <View>
-          <Text style={s.kicker}>쉬운 조건 고르기</Text>
-          <Text style={s.title}>원하는 종목을 골라볼까요?</Text>
-        </View>
+        <Text style={s.title}>조건 고르기</Text>
         <Text style={s.step}>01 / 04</Text>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={s.content}
       >
-        <Text style={s.intro}>
-          뜻을 몰라도 괜찮아요. 기본값 그대로 시작해도 됩니다.
-        </Text>
         {basic.map((item, i) => (
           <ChoiceGroup key={item[0]} item={item} index={i + 1} />
         ))}
         <Pressable style={s.deepButton} onPress={() => setDeep((x) => !x)}>
           <View>
-            <Text style={s.deepKicker}>선택사항</Text>
             <Text style={s.deepTitle}>
-              {deep ? "간단히 보기" : "더 꼼꼼히 고르기"}
+              {deep ? "조건 접기" : "조건 더 보기"}
             </Text>
           </View>
           <Text style={s.deepArrow}>{deep ? "↑" : "↓"}</Text>
         </Pressable>
         {deep && (
           <View style={s.deepArea}>
-            <Text style={s.deepNotice}>
-              조건을 많이 넣으면 후보가 줄고 좋은 종목을 놓칠 수도 있어요.
-            </Text>
             {advanced.map((item, i) => (
               <ChoiceGroup
                 key={item[0]}
@@ -135,21 +125,19 @@ export default function Setup() {
         )}
       </ScrollView>
       <PrimaryButton
-        label="두더지에게 맡기기"
+        label="종목 찾기"
         onPress={() => router.push("/digging")}
       />
     </SafeAreaView>
   );
 }
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream, padding: spacing.lg },
+  page: { flex: 1, backgroundColor: colors.paper, padding: spacing.lg },
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 16,
     paddingBottom: 16,
-    borderBottomWidth: 2,
-    borderColor: colors.ink,
   },
   back: { fontSize: 28, color: colors.ink },
   kicker: {
@@ -186,23 +174,21 @@ const s = StyleSheet.create({
     paddingHorizontal: 13,
     borderWidth: 1,
     borderColor: colors.line,
-    borderRadius: 1,
+    borderRadius: radius.sm,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    backgroundColor: colors.paper,
+    backgroundColor: colors.cream,
   },
-  selected: { backgroundColor: colors.ink, borderColor: colors.ink },
+  selected: { backgroundColor: colors.soil, borderColor: colors.soil },
   optionText: { fontSize: 13, fontWeight: "700", color: colors.muted },
   selectedText: { color: colors.paper },
   check: { fontSize: 8, color: colors.goldLight },
   deepButton: {
     marginTop: 20,
-    backgroundColor: colors.soil,
+    backgroundColor: colors.cream,
     padding: 18,
-    borderRadius: 1,
-    borderLeftWidth: 5,
-    borderColor: colors.gold,
+    borderRadius: radius.lg,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -214,12 +200,12 @@ const s = StyleSheet.create({
   },
   deepTitle: {
     fontSize: 20,
-    color: colors.paper,
+    color: colors.ink,
     fontWeight: "900",
     marginTop: 3,
   },
-  deepArrow: { marginLeft: "auto", fontSize: 24, color: colors.goldLight },
-  deepArea: { borderLeftWidth: 3, borderColor: colors.gold, paddingLeft: 14 },
+  deepArrow: { marginLeft: "auto", fontSize: 24, color: colors.soil },
+  deepArea: { paddingTop: 8 },
   deepNotice: {
     fontSize: 12,
     lineHeight: 18,

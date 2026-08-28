@@ -61,30 +61,28 @@ export default function Digging() {
   return (
     <SafeAreaView style={s.page}>
       <View style={s.header}>
-        <Text style={s.kicker}>두더지의 탈락 기록 · 실제 회사 자료</Text>
+        <Text style={s.kicker}>종목 찾는 중</Text>
         <Text style={s.step}>02 / 04</Text>
       </View>
       <View style={s.hero}>
         <View>
           <Text style={s.title}>
             {error
-              ? "데이터를 불러오지\n못했어요."
+              ? "불러오지 못했어요"
               : isLoading
-                ? "회사 자료를\n읽고 있어요."
+                ? "회사 자료를 보고 있어요"
                 : complete
                   ? data.resultMode === "exact"
-                    ? `${data.exactMatchCount}개가 자동 조건을\n통과했어요.`
-                    : data.coverageComplete
-                      ? `정확히 맞는 종목은 0개,\n가까운 후보를 찾았어요.`
-                      : `확인한 가격 후보에서는 0개,\n가까운 후보를 찾았어요.`
-                  : "숫자를 쉽게\n비교하고 있어요."}
+                    ? `${data.exactMatchCount}개를 찾았어요`
+                    : "가까운 후보를 찾았어요"
+                  : "조건에 맞춰 고르고 있어요"}
           </Text>
           <Text style={s.hint}>
             {error
-              ? "PC에서 데이터 서버를 먼저 켜주세요."
+              ? "잠시 후 다시 시도해주세요"
               : data
-                ? `${data.scope} · ${data.source}${data.priceCheckedCount ? ` · 가격 ${data.priceCheckedCount}개 확인` : ""}`
-                : "회사가 제출한 최신 자료 확인 중"}
+                ? `${data.source} 기준`
+                : "최신 자료 확인 중"}
           </Text>
         </View>
         <Animated.View style={moleStyle}>
@@ -127,8 +125,8 @@ export default function Digging() {
                         <Text style={s.stageLabel}>{item.label}</Text>
                         <Text style={s.removed}>
                           {i === 0
-                            ? "회사 자료 확인"
-                            : `${item.removed.toLocaleString()}개 탈락`}
+                            ? "전체 종목"
+                            : `${item.removed.toLocaleString()}개 제외`}
                         </Text>
                       </View>
                       <Text style={s.count}>{item.count.toLocaleString()}</Text>
@@ -160,8 +158,8 @@ export default function Digging() {
           <PrimaryButton
             label={
               data.resultMode === "exact"
-                ? `자동 조건을 통과한 ${data.results.length}개 보기`
-                : `가까운 후보 ${data.results.length}개와 부족한 조건 보기`
+                ? `후보 ${data.results.length}개 보기`
+                : `가까운 후보 ${data.results.length}개 보기`
             }
             onPress={() => router.push("/results")}
           />
@@ -170,11 +168,9 @@ export default function Digging() {
       {complete && data.results.length === 0 && (
         <View style={s.footer}>
           <Text style={s.emptyTitle}>조건을 통과한 후보가 없어요</Text>
-          <Text style={s.emptyText}>
-            나쁜 결과가 아니라 조건이 좁다는 뜻이에요. 한 가지씩만 넓혀보세요.
-          </Text>
+          <Text style={s.emptyText}>조건을 조금 넓혀보세요.</Text>
           <PrimaryButton
-            label="조건 한 단계 넓히기"
+            label="조건 다시 고르기"
             onPress={() => router.replace(profile ? "/conversation" : "/setup")}
           />
         </View>
@@ -183,19 +179,16 @@ export default function Digging() {
   );
 }
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   header: {
     marginHorizontal: spacing.lg,
     paddingVertical: 12,
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderColor: colors.line,
   },
   kicker: {
     fontSize: 11,
     fontWeight: "900",
-    letterSpacing: 1.1,
-    color: colors.green,
+    color: colors.soil,
   },
   step: { marginLeft: "auto", fontSize: 11, color: colors.muted },
   hero: {
@@ -215,7 +208,13 @@ const s = StyleSheet.create({
     fontSize: 20,
     color: colors.soilLight,
   },
-  path: { flex: 1, backgroundColor: colors.soilDark },
+  path: {
+    flex: 1,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    backgroundColor: colors.soilDark,
+    overflow: "hidden",
+  },
   pathContent: { padding: spacing.lg },
   stage: { minHeight: 66, justifyContent: "center" },
   pending: { opacity: 0.12 },
@@ -273,7 +272,7 @@ const s = StyleSheet.create({
     color: colors.goldLight,
   },
   rejectReason: { flex: 1, fontSize: 12, color: colors.paper },
-  footer: { padding: spacing.md, backgroundColor: colors.cream },
+  footer: { padding: spacing.md, backgroundColor: colors.paper },
   emptyTitle: { fontSize: 15, fontWeight: "900", color: colors.ink },
   emptyText: {
     marginVertical: 7,

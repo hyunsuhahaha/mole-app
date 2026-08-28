@@ -3,7 +3,7 @@ import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { Mole } from "../src/components/Mole";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, radius, spacing } from "../src/theme/tokens";
 import { PrimaryButton } from "../src/components/PrimaryButton";
 import { goBackOr } from "../src/navigation/goBackOr";
 export default function Results() {
@@ -26,22 +26,19 @@ export default function Results() {
         >
           <Text style={s.back}>←</Text>
         </Pressable>
-        <View>
-          <Text style={s.kicker}>두더지가 찾은 후보</Text>
-          <Text style={s.title}>
-            {showingClosest
-              ? `가장 가까운 후보 ${results.length}개`
-              : `자동 조건 통과 ${exactCount}개`}
-          </Text>
-        </View>
+        <Text style={s.title}>
+          {showingClosest
+            ? `가까운 후보 ${results.length}개`
+            : `후보 ${exactCount}개`}
+        </Text>
         <Text style={s.step}>03 / 04</Text>
       </View>
       <View style={s.found}>
         <Mole mood="found" size={108} />
         <Text style={s.foundCopy}>
           {showingClosest
-            ? `${coverageNote ? "확인한 범위에서는 정확히 맞지 않았어요." : "정확히 맞는 종목은 없었어요."}\n부족한 조건을 숨기지 않고 보여드려요.`
-            : `순위보다 이유를 먼저 보세요.\n점수는 위험까지 확인한 결과예요.`}
+            ? "조건에 가까운 순서예요"
+            : "근거와 위험을 함께 봐요"}
         </Text>
       </View>
       <ScrollView
@@ -62,7 +59,7 @@ export default function Results() {
         )}
         {profile && (
           <View style={s.brief}>
-            <Text style={s.briefLabel}>내가 부탁한 말</Text>
+            <Text style={s.briefLabel}>찾은 조건</Text>
             <Text style={s.briefQuery}>“{profile.query}”</Text>
             <Text style={s.briefMeta}>
               자동 적용 {profile.must.length}개 · 직접 확인{" "}
@@ -103,7 +100,7 @@ export default function Results() {
                 </View>
                 <View style={s.score}>
                   <Text style={s.scoreValue}>{stock.score}</Text>
-                  <Text style={s.scoreLabel}>자료 일치도</Text>
+                  <Text style={s.scoreLabel}>점수</Text>
                 </View>
               </View>
               <Text style={s.reason}>{stock.reason}</Text>
@@ -133,19 +130,18 @@ export default function Results() {
               <View style={s.risk}>
                 <Text style={s.riskMark}>!</Text>
                 <Text style={s.riskText}>{stock.risk}</Text>
-                <Text style={s.open}>쉽게 보기 →</Text>
+                <Text style={s.open}>자세히</Text>
               </View>
             </View>
           </Pressable>
         ))}
         <View style={s.resultNotice}>
-          <Text style={s.resultNoticeTitle}>후보는 추천주가 아니에요</Text>
+          <Text style={s.resultNoticeTitle}>투자 전 확인하세요</Text>
           <Text style={s.resultNoticeText}>
-            마지막으로 정상 동기화된 SEC 공시 스냅샷만 비교합니다. 투자 전 최신
-            공시 원문, 가격, 경쟁사와 본인의 손실 감수 범위를 따로 확인하세요.
+            후보는 매수 추천이 아니에요. 최신 공시와 가격을 직접 확인하세요.
           </Text>
           <PrimaryButton
-            label="데이터와 판단 기준 보기"
+            label="판단 기준 보기"
             onPress={() => router.push("/methodology")}
           />
         </View>
@@ -154,12 +150,10 @@ export default function Results() {
   );
 }
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   header: {
     marginHorizontal: spacing.lg,
     paddingVertical: 14,
-    borderBottomWidth: 2,
-    borderColor: colors.ink,
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
@@ -191,16 +185,14 @@ const s = StyleSheet.create({
   brief: {
     marginBottom: 12,
     padding: 14,
-    borderRadius: 1,
-    borderLeftWidth: 4,
-    borderColor: colors.gold,
-    backgroundColor: "#E8DDC6",
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
   },
   briefLabel: {
     fontSize: 9,
     fontWeight: "900",
     letterSpacing: 1.2,
-    color: colors.green,
+    color: colors.soil,
   },
   briefQuery: {
     marginTop: 5,
@@ -213,9 +205,8 @@ const s = StyleSheet.create({
   coverageBox: {
     marginBottom: 12,
     padding: 12,
-    borderLeftWidth: 3,
-    borderColor: colors.gold,
-    backgroundColor: colors.paper,
+    borderRadius: radius.md,
+    backgroundColor: "#FFF7E6",
   },
   coverageTitle: { fontSize: 9, fontWeight: "900", color: colors.gold },
   coverageText: {
@@ -227,7 +218,7 @@ const s = StyleSheet.create({
   row: {
     flexDirection: "row",
     paddingVertical: 18,
-    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: colors.line,
   },
   pressed: { opacity: 0.6 },
@@ -267,16 +258,14 @@ const s = StyleSheet.create({
   open: {
     marginLeft: "auto",
     fontSize: 11,
-    color: colors.green,
+    color: colors.soil,
     fontWeight: "900",
   },
   missedBox: {
     marginTop: 10,
     padding: 11,
-    borderRadius: 1,
-    borderLeftWidth: 3,
-    borderColor: colors.danger,
-    backgroundColor: "#EBD9CC",
+    borderRadius: radius.md,
+    backgroundColor: "#FFF0F1",
   },
   missedTitle: { fontSize: 9, fontWeight: "900", color: colors.danger },
   missedText: { marginTop: 4, fontSize: 10, lineHeight: 15, color: colors.ink },
@@ -286,9 +275,8 @@ const s = StyleSheet.create({
     flex: 1,
     minHeight: 60,
     padding: 9,
-    backgroundColor: colors.paper,
-    borderTopWidth: 2,
-    borderColor: colors.gold,
+    borderRadius: radius.sm,
+    backgroundColor: colors.cream,
   },
   numberValue: { fontSize: 15, fontWeight: "900", color: colors.green },
   numberLabel: {

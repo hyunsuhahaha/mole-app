@@ -61,37 +61,37 @@ export const intents: {
   {
     id: "growth",
     title: "매출이 빠르게 크는 회사",
-    description: "성장 속도와 지속 가능성을 SEC 공시로 확인",
+    description: "매출 성장 중심",
     supported: true,
   },
   {
     id: "quality",
     title: "지금 돈을 버는 회사",
-    description: "최근 영업 흑자와 주주 희석을 SEC 공시로 확인",
+    description: "수익성 중심",
     supported: true,
   },
   {
     id: "fallen",
     title: "많이 떨어졌지만 멀쩡한 회사",
-    description: "가격 흐름과 SEC 실적을 함께 비교",
+    description: "낙폭과 실적 비교",
     supported: true,
   },
   {
     id: "value",
     title: "실적에 비해 싸 보이는 회사",
-    description: "가격과 회사가 버는 돈을 함께 비교",
+    description: "실적 대비 가격 비교",
     supported: true,
   },
   {
     id: "dividend",
     title: "배당을 꾸준히 주는 회사",
-    description: "배당 기록과 현재 지급 여력을 함께 확인",
+    description: "배당 기록 중심",
     supported: true,
   },
   {
     id: "emerging",
     title: "아직 덜 알려진 작은 성장 회사",
-    description: "회사 크기와 매출 성장, 생존 위험을 함께 확인",
+    description: "작은 성장주 중심",
     supported: true,
   },
 ];

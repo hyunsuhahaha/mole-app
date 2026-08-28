@@ -6,7 +6,7 @@ import { PrimaryButton } from "../src/components/PrimaryButton";
 import { calculateRiskProfile, riskQuestions } from "../src/data/riskProfile";
 import { goBackOr } from "../src/navigation/goBackOr";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, fonts, spacing } from "../src/theme/tokens";
+import { colors, fonts, radius, spacing } from "../src/theme/tokens";
 
 export default function Profile() {
   const { next } = useLocalSearchParams<{ next?: string }>();
@@ -39,10 +39,7 @@ export default function Profile() {
         >
           <Text style={s.back}>←</Text>
         </Pressable>
-        <View>
-          <Text style={s.kicker}>먼저 나부터 파악하기</Text>
-          <Text style={s.headerTitle}>나의 투자 탐색 성향</Text>
-        </View>
+        <Text style={s.headerTitle}>투자 성향</Text>
         <Text style={s.progress}>
           {complete ? "완료" : `${step + 1} / ${riskQuestions.length}`}
         </Text>
@@ -64,24 +61,22 @@ export default function Profile() {
       >
         {complete ? (
           <>
-            <Text style={s.eyebrow}>현재 답변으로 본 성향</Text>
+            <Text style={s.eyebrow}>내 투자 성향</Text>
             <Text style={s.resultTitle}>{profile.title}</Text>
             <Text style={s.resultSummary}>{profile.summary}</Text>
             <View style={s.resultBox}>
-              <Text style={s.resultBoxTitle}>검색에 이렇게 반영해요</Text>
+              <Text style={s.resultBoxTitle}>종목을 찾을 때</Text>
               <Text style={s.resultBoxText}>
                 {profile.level === "stable"
-                  ? "흑자·배당·낮은 위험 경로를 먼저 보여주고 적자 회사는 뒤로 보냅니다."
+                  ? "돈을 벌고 재무가 안정적인 회사를 먼저 봐요."
                   : profile.level === "balanced"
-                    ? "검증된 성장과 현재 수익성을 함께 보며 한쪽 조건만으로 고르지 않습니다."
-                    : "작은 성장 회사와 큰 낙폭 후보도 앞에 보여주되 적자·현금·주식 수 증가 위험을 더 크게 표시합니다."}
+                    ? "성장성과 안정성을 함께 봐요."
+                    : "성장 가능성을 넓게 보고 위험도 함께 표시해요."}
               </Text>
             </View>
             <View style={s.notice}>
-              <Text style={s.noticeTitle}>꼭 알아두세요</Text>
               <Text style={s.noticeText}>
-                이 결과는 정식 투자성향 진단이나 매수 추천이 아니에요. 지금
-                답변에 맞춰 후보를 설명하고 정렬하는 용도예요.
+                투자 권유가 아닌 종목 탐색 기준이에요.
               </Text>
             </View>
             <Pressable
@@ -94,20 +89,16 @@ export default function Profile() {
           </>
         ) : (
           <>
-            <Text style={s.eyebrow}>정답은 없어요</Text>
             <Text style={s.question}>{question.text}</Text>
             <Text style={s.help}>{question.help}</Text>
             <View style={s.options}>
-              {question.options.map((option, index) => (
+              {question.options.map((option) => (
                 <Pressable
                   key={option.value}
                   accessibilityRole="button"
                   onPress={() => answer(option.value)}
                   style={({ pressed }) => [s.option, pressed && s.pressed]}
                 >
-                  <Text style={s.optionIndex}>
-                    {String(index + 1).padStart(2, "0")}
-                  </Text>
                   <View style={s.optionBody}>
                     <Text style={s.optionLabel}>{option.label}</Text>
                     <Text style={s.optionNote}>{option.note}</Text>
@@ -145,12 +136,10 @@ export default function Profile() {
 }
 
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   header: {
     minHeight: 70,
     marginHorizontal: spacing.lg,
-    borderBottomWidth: 2,
-    borderColor: colors.ink,
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
@@ -165,16 +154,16 @@ const s = StyleSheet.create({
   headerTitle: { color: colors.ink, fontSize: 20, fontFamily: fonts.bold },
   progress: { marginLeft: "auto", fontSize: 11, color: colors.muted },
   progressTrack: {
-    height: 3,
+    height: 4,
     marginHorizontal: spacing.lg,
     backgroundColor: colors.line,
     overflow: "hidden",
   },
-  progressFill: { height: "100%", backgroundColor: colors.gold },
-  content: { padding: spacing.lg, paddingBottom: 40 },
+  progressFill: { height: "100%", backgroundColor: colors.soil },
+  content: { padding: spacing.lg, paddingTop: 40, paddingBottom: 40 },
   eyebrow: {
     marginTop: 18,
-    color: colors.green,
+    color: colors.muted,
     fontSize: 10,
     fontFamily: fonts.bold,
     letterSpacing: 1.3,
@@ -195,18 +184,18 @@ const s = StyleSheet.create({
   },
   options: {
     marginTop: 25,
-    borderTopWidth: 2,
-    borderColor: colors.ink,
+    gap: 12,
   },
   option: {
-    minHeight: 82,
-    paddingHorizontal: 2,
-    borderBottomWidth: 1,
-    borderColor: colors.line,
+    minHeight: 80,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
-  pressed: { backgroundColor: "#E8DDC6" },
+  pressed: { backgroundColor: "#EAEDF0" },
   optionIndex: {
     width: 38,
     marginRight: 9,
@@ -224,7 +213,7 @@ const s = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.muted,
   },
-  arrow: { marginLeft: 10, color: colors.gold, fontSize: 20 },
+  arrow: { marginLeft: 10, color: colors.soil, fontSize: 20 },
   previous: { alignSelf: "flex-start", paddingVertical: 20 },
   previousText: { color: colors.muted, fontSize: 12, fontWeight: "800" },
   resultTitle: {
@@ -239,17 +228,15 @@ const s = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     fontFamily: fonts.semibold,
-    color: colors.soil,
+    color: colors.muted,
   },
   resultBox: {
     marginTop: 25,
     padding: 18,
-    borderRadius: 1,
-    borderWidth: 2,
-    borderColor: colors.green,
-    backgroundColor: colors.paper,
+    borderRadius: radius.lg,
+    backgroundColor: colors.cream,
   },
-  resultBoxTitle: { fontSize: 12, fontWeight: "900", color: colors.green },
+  resultBoxTitle: { fontSize: 12, fontWeight: "900", color: colors.soil },
   resultBoxText: {
     marginTop: 7,
     fontSize: 13,
@@ -259,10 +246,8 @@ const s = StyleSheet.create({
   notice: {
     marginTop: 13,
     padding: 15,
-    borderRadius: 1,
-    borderLeftWidth: 4,
-    borderColor: colors.gold,
-    backgroundColor: "#E8DDC6",
+    borderRadius: radius.md,
+    backgroundColor: "#FFF6E0",
   },
   noticeTitle: { fontSize: 11, fontWeight: "900", color: colors.ink },
   noticeText: {

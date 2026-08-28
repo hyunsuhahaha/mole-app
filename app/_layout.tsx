@@ -87,11 +87,11 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
-  shell: { flex: 1, backgroundColor: colors.soilDark },
+  shell: { flex: 1, backgroundColor: colors.cream },
   appSurface: {
     flex: 1,
     width: "100%",
-    maxWidth: 920,
+    maxWidth: 720,
     alignSelf: "center",
     backgroundColor: colors.cream,
   },
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   tabs: {
     width: "100%",
-    maxWidth: 920,
+    maxWidth: 720,
     alignSelf: "center",
     minHeight: 64,
     paddingBottom: 5,
@@ -120,7 +120,8 @@ const styles = StyleSheet.create({
     top: 0,
     width: 32,
     height: 3,
-    backgroundColor: colors.gold,
+    borderRadius: 2,
+    backgroundColor: colors.soil,
   },
   icon: { fontSize: 19, lineHeight: 22, color: colors.muted },
   label: {
@@ -129,5 +130,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     color: colors.muted,
   },
-  active: { color: colors.green },
+  active: { color: colors.soil },
 });

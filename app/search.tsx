@@ -12,7 +12,7 @@ import { router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { researchApi, type StockSearchItem } from "../src/api/research";
 import { goBackOr } from "../src/navigation/goBackOr";
-import { colors, spacing } from "../src/theme/tokens";
+import { colors, radius, spacing } from "../src/theme/tokens";
 
 export default function SearchStocks() {
   const [query, setQuery] = useState("");
@@ -209,7 +209,7 @@ function StockRow({ stock }: { stock: StockSearchItem }) {
 }
 
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   header: {
     minHeight: 62,
     marginHorizontal: spacing.lg,
@@ -229,9 +229,9 @@ const s = StyleSheet.create({
   marketTabs: {
     marginHorizontal: spacing.lg,
     marginTop: 14,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: colors.ink,
+    padding: 4,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
   },
   marketTab: {
@@ -239,8 +239,9 @@ const s = StyleSheet.create({
     minHeight: 42,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: radius.sm,
   },
-  marketTabActive: { backgroundColor: colors.ink },
+  marketTabActive: { backgroundColor: colors.soil },
   marketTabText: { fontSize: 11, fontWeight: "900", color: colors.muted },
   marketTabTextActive: { color: colors.paper },
   searchBox: {
@@ -248,14 +249,12 @@ const s = StyleSheet.create({
     margin: spacing.lg,
     marginBottom: 8,
     paddingHorizontal: 16,
-    borderRadius: 1,
-    backgroundColor: colors.paper,
-    borderWidth: 2,
-    borderColor: colors.ink,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
-  searchMark: { marginRight: 10, fontSize: 25, color: colors.green },
+  searchMark: { marginRight: 10, fontSize: 25, color: colors.soil },
   input: {
     flex: 1,
     fontSize: 16,
@@ -291,9 +290,8 @@ const s = StyleSheet.create({
     width: 42,
     height: 42,
     marginRight: 12,
-    borderRadius: 1,
-    borderWidth: 1,
-    borderColor: colors.line,
+    borderRadius: 12,
+    backgroundColor: colors.cream,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -316,13 +314,17 @@ const s = StyleSheet.create({
   },
   down: { color: colors.danger },
   metricLabel: { marginTop: 3, fontSize: 8, color: colors.muted },
-  skeleton: { height: 68, marginVertical: 5, backgroundColor: "#E7DCC8" },
+  skeleton: {
+    height: 68,
+    marginVertical: 5,
+    borderRadius: 12,
+    backgroundColor: colors.cream,
+  },
   stateBox: {
     marginTop: 10,
     padding: 18,
-    borderLeftWidth: 4,
-    borderColor: colors.gold,
-    backgroundColor: colors.paper,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
   },
   stateTitle: { fontSize: 15, fontWeight: "900", color: colors.ink },
   stateText: {
@@ -335,7 +337,7 @@ const s = StyleSheet.create({
     marginTop: 13,
     fontSize: 11,
     fontWeight: "900",
-    color: colors.green,
+    color: colors.soil,
   },
   disclaimer: {
     paddingVertical: 18,

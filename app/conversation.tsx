@@ -22,7 +22,7 @@ import {
   type RuleBucket,
 } from "../src/data/screenerConversation";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, fonts, spacing } from "../src/theme/tokens";
+import { colors, fonts, radius, spacing } from "../src/theme/tokens";
 import { goBackOr } from "../src/navigation/goBackOr";
 import { intentOrderByRisk } from "../src/data/riskProfile";
 
@@ -107,10 +107,7 @@ export default function Conversation() {
         >
           <Text style={s.back}>←</Text>
         </Pressable>
-        <View>
-          <Text style={s.kicker}>사람 말로 종목 찾기</Text>
-          <Text style={s.headerTitle}>두더지에게 부탁하기</Text>
-        </View>
+        <Text style={s.headerTitle}>조건 찾기</Text>
         <Text style={s.progress}>
           {!started
             ? "시작"
@@ -131,11 +128,8 @@ export default function Conversation() {
         >
           {!started ? (
             <>
-              <Text style={s.title}>어떤 회사를{`\n`}찾고 싶어요?</Text>
-              <Text style={s.copy}>
-                투자 용어를 몰라도 돼요. 평소 말하듯 적으면 쉬운 질문 몇 개로
-                조건을 완성할게요.
-              </Text>
+              <Text style={s.title}>어떤 주식을 찾을까요?</Text>
+              <Text style={s.copy}>생각나는 대로 적어보세요</Text>
               <View style={s.inputBox}>
                 <TextInput
                   accessibilityLabel="찾고 싶은 회사 설명"
@@ -153,10 +147,10 @@ export default function Conversation() {
                   onPress={() => start()}
                   style={[s.send, !query.trim() && s.sendDisabled]}
                 >
-                  <Text style={s.sendText}>조건으로 바꾸기 →</Text>
+                  <Text style={s.sendText}>다음</Text>
                 </Pressable>
               </View>
-              <Text style={s.exampleLabel}>이렇게 말해도 돼요</Text>
+              <Text style={s.exampleLabel}>예시</Text>
               {examples.map((example) => (
                 <Pressable
                   accessibilityRole="button"
@@ -173,18 +167,8 @@ export default function Conversation() {
               <View style={s.userBubble}>
                 <Text style={s.userBubbleText}>{query}</Text>
               </View>
-              <Text style={s.moleLabel}>1번 질문 · 찾는 방향</Text>
-              <Text style={s.question}>어떤 쪽에 더 가까워요?</Text>
-              <Text style={s.help}>
-                여기서 고른 방향에 따라 다음 질문이 완전히 달라져요.
-              </Text>
+              <Text style={s.question}>어떤 쪽에 가까워요?</Text>
               <View style={s.options}>
-                <View style={s.profileStrip}>
-                  <Text style={s.profileStripTitle}>{riskProfile.title}</Text>
-                  <Text style={s.profileStripText}>
-                    성향에 맞는 방향부터 보여드려요.
-                  </Text>
-                </View>
                 {orderedIntents.map((item, index) => {
                   const recommended = suggestedIntent === item.id;
                   const profileRecommended = !suggestedIntent && index === 0;
@@ -226,8 +210,7 @@ export default function Conversation() {
             </>
           ) : complete && built ? (
             <>
-              <Text style={s.kicker}>조건 번역 완료</Text>
-              <Text style={s.title}>내가 찾는 주식</Text>
+              <Text style={s.title}>조건을 정했어요</Text>
               <Text style={s.quote}>“{query}”</Text>
               <Text style={s.selectedIntent}>
                 선택한 방향 ·{" "}
@@ -235,40 +218,29 @@ export default function Conversation() {
               </Text>
               <View style={s.coverage}>
                 <Text style={s.coverageStrong}>
-                  {built.profile.answeredCount}개 질문 완료
+                  답변 {built.profile.answeredCount}개
                 </Text>
                 <Text style={s.coverageText}>
                   {built.profile.unknownCount
-                    ? `잘 모르겠다고 답한 ${built.profile.unknownCount}개 조건은 후보를 줄이지 않았어요.`
-                    : "모든 질문에 기준을 정했어요."}
+                    ? `${built.profile.unknownCount}개 조건은 건너뛰었어요.`
+                    : "이대로 찾아볼게요."}
                 </Text>
               </View>
               <RuleGroup
                 color={colors.green}
-                label="지금 검색에 반영할 조건"
+                label="적용할 조건"
                 rules={built.profile.must}
               />
               <RuleGroup
                 color={colors.gold}
-                label="우선 확인할 조건"
+                label="먼저 볼 조건"
                 rules={built.profile.prefer}
               />
               <RuleGroup
                 color={colors.danger}
-                label="후보에서 추가로 확인할 조건"
+                label="더 확인할 조건"
                 rules={built.profile.pending}
               />
-              <View style={s.notice}>
-                <Text style={s.noticeTitle}>
-                  지금 검색에 바로 들어가는 조건
-                </Text>
-                <Text style={s.noticeText}>
-                  매출 성장률, 최근 영업 흑자와 주식 수 증가율은 SEC 회사 자료로
-                  거릅니다. 가격 조건은 시세 연결 시 계산하고, 자동으로 단정할
-                  수 없는 제품·고객·향후 사건은 후보 화면에서 확인 항목으로
-                  보여줘요.
-                </Text>
-              </View>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => setStep(Math.max(0, questions.length - 1))}
@@ -283,7 +255,6 @@ export default function Conversation() {
                 <Text style={s.userBubbleText}>{query}</Text>
               </View>
               <View style={s.questionMeta}>
-                <Text style={s.moleLabel}>답에 따라 다음 질문이 달라져요</Text>
                 <SupportBadge bucket={question.bucket} />
               </View>
               <Text style={s.question}>{question.text}</Text>
@@ -379,13 +350,11 @@ function RuleGroup({
 }
 
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   flex: { flex: 1 },
   header: {
     marginHorizontal: spacing.lg,
     minHeight: 70,
-    borderBottomWidth: 2,
-    borderColor: colors.ink,
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
@@ -399,11 +368,11 @@ const s = StyleSheet.create({
   },
   headerTitle: { color: colors.ink, fontSize: 20, fontFamily: fonts.bold },
   progress: { marginLeft: "auto", fontSize: 11, color: colors.muted },
-  content: { padding: spacing.lg, paddingBottom: 36 },
+  content: { padding: spacing.lg, paddingTop: 40, paddingBottom: 36 },
   title: {
     marginTop: 20,
-    fontSize: 37,
-    lineHeight: 42,
+    fontSize: 32,
+    lineHeight: 40,
     letterSpacing: -1.4,
     fontFamily: fonts.bold,
     color: colors.ink,
@@ -413,10 +382,8 @@ const s = StyleSheet.create({
     marginTop: 24,
     padding: 16,
     minHeight: 150,
-    borderRadius: 1,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    backgroundColor: colors.paper,
+    borderRadius: radius.lg,
+    backgroundColor: colors.cream,
   },
   input: {
     flex: 1,
@@ -429,10 +396,10 @@ const s = StyleSheet.create({
   },
   send: {
     alignSelf: "flex-end",
-    backgroundColor: colors.ink,
+    backgroundColor: colors.soil,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    borderRadius: 1,
+    borderRadius: radius.sm,
   },
   sendDisabled: { opacity: 0.25 },
   sendText: { color: colors.paper, fontSize: 12, fontWeight: "900" },
@@ -451,9 +418,7 @@ const s = StyleSheet.create({
     maxWidth: "88%",
     marginTop: 12,
     padding: 14,
-    borderRadius: 1,
-    borderRightWidth: 4,
-    borderColor: colors.gold,
+    borderRadius: radius.md,
     backgroundColor: colors.soil,
   },
   userBubbleText: { color: colors.paper, fontSize: 13, lineHeight: 19 },
@@ -488,7 +453,7 @@ const s = StyleSheet.create({
     color: colors.ink,
   },
   help: { marginTop: 8, fontSize: 13, lineHeight: 19, color: colors.muted },
-  options: { marginTop: 22, borderTopWidth: 2, borderColor: colors.ink },
+  options: { marginTop: 22, gap: 12 },
   profileStrip: {
     marginTop: 16,
     padding: 12,
@@ -501,22 +466,20 @@ const s = StyleSheet.create({
   option: {
     minHeight: 57,
     paddingHorizontal: 17,
-    borderBottomWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: "transparent",
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
   intentOption: {
     minHeight: 76,
     paddingHorizontal: 17,
-    borderBottomWidth: 1,
-    borderColor: colors.line,
-    backgroundColor: "transparent",
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
-  recommendedOption: { borderLeftWidth: 4, borderColor: colors.green },
+  recommendedOption: { borderWidth: 1.5, borderColor: colors.soil },
   disabledOption: { opacity: 0.5, backgroundColor: "#E9E3D8" },
   intentBody: { flex: 1 },
   intentTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -524,17 +487,17 @@ const s = StyleSheet.create({
   recommend: {
     paddingHorizontal: 7,
     paddingVertical: 3,
-    borderRadius: 1,
+    borderRadius: 6,
     overflow: "hidden",
-    backgroundColor: colors.green,
+    backgroundColor: colors.soil,
     color: colors.paper,
     fontSize: 8,
     fontWeight: "900",
   },
   soon: { color: colors.danger, fontSize: 8, fontWeight: "900" },
-  optionPressed: { backgroundColor: colors.ink, borderColor: colors.ink },
+  optionPressed: { backgroundColor: "#EAEDF0" },
   optionText: { flex: 1, color: colors.ink, fontSize: 14, fontWeight: "800" },
-  optionArrow: { color: colors.gold, fontSize: 20 },
+  optionArrow: { color: colors.soil, fontSize: 20 },
   previous: { alignSelf: "flex-start", paddingVertical: 18 },
   previousText: { color: colors.muted, fontSize: 12, fontWeight: "800" },
   quote: {
@@ -554,8 +517,8 @@ const s = StyleSheet.create({
   coverage: {
     marginBottom: 12,
     padding: 13,
-    borderRadius: 1,
-    backgroundColor: "#E8DDC6",
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
   },
   coverageStrong: { color: colors.ink, fontSize: 12, fontWeight: "900" },
   coverageText: {
@@ -595,5 +558,10 @@ const s = StyleSheet.create({
     fontSize: 11,
     lineHeight: 17,
   },
-  footer: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
+  footer: {
+    padding: spacing.md,
+    borderTopWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.paper,
+  },
 });

@@ -12,12 +12,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Mole } from "../src/components/Mole";
 import { researchApi, type StockSearchItem } from "../src/api/research";
 import { useDigStore } from "../src/store/useDigStore";
-import { colors, fonts, spacing } from "../src/theme/tokens";
+import { colors, fonts, radius, spacing } from "../src/theme/tokens";
 
 const lenses = [
-  { mark: "↗", title: "빠르게 성장", copy: "매출이 실제로 크는 회사" },
-  { mark: "$", title: "지금 흑자", copy: "본업으로 돈 버는 회사" },
-  { mark: "↓", title: "많이 하락", copy: "가격과 사업을 따로 확인" },
+  { mark: "↗", title: "성장 중인 회사" },
+  { mark: "$", title: "꾸준히 돈 버는 회사" },
+  { mark: "↓", title: "많이 떨어진 회사" },
 ];
 
 export default function Home() {
@@ -38,8 +38,7 @@ export default function Home() {
           <View style={s.brandDot} />
         </View>
         <View>
-          <Text style={s.brand}>MOLE</Text>
-          <Text style={s.brandSub}>주식 발굴 연습장</Text>
+          <Text style={s.brand}>두더지</Text>
         </View>
         <Pressable
           accessibilityRole="button"
@@ -47,7 +46,7 @@ export default function Home() {
           style={({ pressed }) => [s.profile, pressed && s.pressed]}
         >
           <Text style={s.profileTitle}>
-            {riskProfile?.title ?? "성향 알아보기"}
+            {riskProfile?.title ?? "투자 성향"}
           </Text>
           <Text style={s.profileArrow}>→</Text>
         </Pressable>
@@ -56,34 +55,20 @@ export default function Home() {
         contentContainerStyle={[s.content, !compact && s.contentWide]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={s.folio}>
-          <Text style={s.folioText}>FIELD NOTE · 001</Text>
-          <Text style={s.folioText}>NYSE / NASDAQ</Text>
-        </View>
-        <Text style={s.greeting}>시장 전체에서{`\n`}근거 있는 회사 찾기</Text>
+        <Text style={s.greeting}>어떤 주식을{`\n`}찾고 있나요?</Text>
+        <Text style={s.greetingSub}>조건부터 천천히 골라봐요</Text>
         <Pressable
           accessibilityRole="search"
           onPress={() => router.push("/search")}
           style={({ pressed }) => [s.search, pressed && s.pressed]}
         >
           <Text style={s.searchIcon}>⌕</Text>
-          <Text style={s.searchText}>회사명이나 종목코드 검색</Text>
-          <Text style={s.searchHint}>4,474개 공시</Text>
+          <Text style={s.searchText}>회사명·종목코드 검색</Text>
         </Pressable>
         <View style={s.digPanel}>
-          <View style={s.strata}>
-            <View style={[s.strataLine, s.strataOne]} />
-            <View style={[s.strataLine, s.strataTwo]} />
-            <View style={[s.strataLine, s.strataThree]} />
-          </View>
           <View style={s.digCopy}>
-            <Text style={s.panelKicker}>SCREENING ROUTE / 01</Text>
-            <Text style={s.panelTitle}>
-              조건을 정하고{`\n`}시장 한 층씩 파기
-            </Text>
-            <Text style={s.panelCopy}>
-              답변을 실제 회사 숫자로 바꿔 탈락 과정과 남은 근거를 보여줘요.
-            </Text>
+            <Text style={s.panelTitle}>조건으로 찾아보기</Text>
+            <Text style={s.panelCopy}>원하는 조건만 고르면 돼요</Text>
             <Pressable
               accessibilityRole="button"
               onPress={() =>
@@ -95,27 +80,27 @@ export default function Home() {
               ]}
             >
               <Text style={s.panelButtonText}>
-                {riskProfile ? "회사 발굴 시작" : "내 성향부터 확인"}
+                {riskProfile ? "시작하기" : "성향부터 확인"}
               </Text>
               <Text style={s.panelButtonArrow}>→</Text>
             </Pressable>
           </View>
           <View style={s.moleWrap}>
-            <Mole mood="idle" size={154} />
+            <Mole mood="idle" size={136} />
           </View>
         </View>
         <View style={s.sectionHead}>
-          <Text style={s.sectionTitle}>탐사 기준 / 03</Text>
+          <Text style={s.sectionTitle}>빠르게 찾기</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() =>
               router.push(riskProfile ? "/conversation" : "/profile")
             }
           >
-            <Text style={s.more}>전체 보기 →</Text>
+            <Text style={s.more}>직접 고르기</Text>
           </Pressable>
         </View>
-        <View style={[s.lenses, compact && s.lensesCompact]}>
+        <View style={s.lenses}>
           {lenses.map((lens) => (
             <Pressable
               key={lens.title}
@@ -123,11 +108,7 @@ export default function Home() {
               onPress={() =>
                 router.push(riskProfile ? "/conversation" : "/profile")
               }
-              style={({ pressed }) => [
-                s.lens,
-                compact && s.lensCompact,
-                pressed && s.pressed,
-              ]}
+              style={({ pressed }) => [s.lens, pressed && s.pressed]}
             >
               <View style={[s.lensMarker, s.lensMarkerCompact]}>
                 <Text style={s.lensMark}>{lens.mark}</Text>
@@ -136,7 +117,6 @@ export default function Home() {
                 <Text style={[s.lensTitle, s.lensTitleCompact]}>
                   {lens.title}
                 </Text>
-                <Text style={[s.lensCopy, s.lensCopyCompact]}>{lens.copy}</Text>
               </View>
               <Text style={s.lensArrow}>→</Text>
             </Pressable>
@@ -158,16 +138,13 @@ export default function Home() {
         )}
         <View style={s.sectionHead}>
           <View>
-            <Text style={s.sectionTitle}>오늘의 관찰 목록</Text>
-            <Text style={s.sectionSub}>
-              흑자이면서 최근 매출이 늘어난 회사예요
-            </Text>
+            <Text style={s.sectionTitle}>오늘 눈에 띈 종목</Text>
           </View>
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push("/search")}
           >
-            <Text style={s.more}>더 보기 →</Text>
+            <Text style={s.more}>전체 보기</Text>
           </Pressable>
         </View>
         {featured.isLoading &&
@@ -181,9 +158,7 @@ export default function Home() {
             style={s.errorBox}
           >
             <Text style={s.errorTitle}>회사 목록을 불러오지 못했어요</Text>
-            <Text style={s.errorText}>
-              데이터 서버를 확인하고 다시 누르세요 →
-            </Text>
+            <Text style={s.errorText}>다시 시도하기</Text>
           </Pressable>
         )}
         {featured.data?.items.map((stock) => (
@@ -195,8 +170,7 @@ export default function Home() {
             onPress={() => router.push("/investors")}
             style={s.linkRow}
           >
-            <Text style={s.linkKicker}>투자자 렌즈</Text>
-            <Text style={s.linkTitle}>유명 투자자의 관점으로 보기</Text>
+            <Text style={s.linkTitle}>투자자별로 보기</Text>
             <Text style={s.linkArrow}>→</Text>
           </Pressable>
           <Pressable
@@ -204,8 +178,7 @@ export default function Home() {
             onPress={() => router.push("/methodology")}
             style={s.linkRow}
           >
-            <Text style={s.linkKicker}>투명한 기준</Text>
-            <Text style={s.linkTitle}>데이터와 계산 방법 확인</Text>
+            <Text style={s.linkTitle}>데이터 기준 보기</Text>
             <Text style={s.linkArrow}>→</Text>
           </Pressable>
         </View>
@@ -250,12 +223,10 @@ function FeaturedRow({ stock }: { stock: StockSearchItem }) {
 }
 
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   topbar: {
     minHeight: 64,
     marginHorizontal: spacing.lg,
-    borderBottomWidth: 1,
-    borderColor: colors.line,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -263,8 +234,8 @@ const s = StyleSheet.create({
     width: 28,
     height: 28,
     marginRight: 9,
-    borderRadius: 1,
-    backgroundColor: colors.ink,
+    borderRadius: 10,
+    backgroundColor: colors.soil,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -277,7 +248,7 @@ const s = StyleSheet.create({
   brand: {
     fontSize: 13,
     fontFamily: fonts.bold,
-    letterSpacing: 2.1,
+    letterSpacing: -0.2,
     color: colors.ink,
   },
   brandSub: {
@@ -290,16 +261,20 @@ const s = StyleSheet.create({
     minHeight: 32,
     marginLeft: "auto",
     paddingHorizontal: 10,
-    borderLeftWidth: 1,
-    borderColor: colors.line,
+    borderRadius: 10,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
     gap: 7,
   },
-  profileTitle: { fontSize: 9, fontFamily: fonts.bold, color: colors.green },
-  profileArrow: { fontSize: 13, color: colors.green },
-  content: { padding: spacing.lg, paddingTop: 21, paddingBottom: 40 },
-  contentWide: { paddingHorizontal: spacing.xl, paddingTop: 28 },
+  profileTitle: {
+    fontSize: 11,
+    fontFamily: fonts.semibold,
+    color: colors.soil,
+  },
+  profileArrow: { fontSize: 13, color: colors.soil },
+  content: { padding: spacing.lg, paddingTop: 32, paddingBottom: 48 },
+  contentWide: { paddingHorizontal: spacing.xl, paddingTop: 40 },
   folio: {
     marginBottom: 14,
     paddingBottom: 8,
@@ -321,18 +296,23 @@ const s = StyleSheet.create({
     fontFamily: fonts.bold,
     color: colors.ink,
   },
+  greetingSub: {
+    marginTop: 10,
+    fontSize: 16,
+    lineHeight: 24,
+    fontFamily: fonts.regular,
+    color: colors.muted,
+  },
   search: {
     minHeight: 59,
-    marginTop: 18,
+    marginTop: 28,
     paddingHorizontal: 16,
-    borderRadius: 1,
-    borderWidth: 2,
-    borderColor: colors.ink,
-    backgroundColor: colors.paper,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
-  searchIcon: { marginRight: 10, fontSize: 26, color: colors.green },
+  searchIcon: { marginRight: 10, fontSize: 24, color: colors.soil },
   searchText: {
     flex: 1,
     fontSize: 14,
@@ -342,13 +322,11 @@ const s = StyleSheet.create({
   searchHint: { fontSize: 8, fontFamily: fonts.bold, color: colors.gold },
   pressed: { opacity: 0.6, transform: [{ translateY: 1 }] },
   digPanel: {
-    minHeight: 220,
-    marginTop: 18,
-    padding: 20,
-    borderRadius: 1,
-    borderLeftWidth: 5,
-    borderColor: colors.gold,
-    backgroundColor: colors.soilDark,
+    minHeight: 188,
+    marginTop: 16,
+    padding: 22,
+    borderRadius: radius.lg,
+    backgroundColor: "#F2F4F6",
     flexDirection: "row",
     overflow: "hidden",
   },
@@ -379,26 +357,25 @@ const s = StyleSheet.create({
     color: colors.goldLight,
   },
   panelTitle: {
-    marginTop: 8,
-    fontSize: 25,
-    lineHeight: 30,
+    fontSize: 22,
+    lineHeight: 29,
     fontFamily: fonts.bold,
-    color: colors.paper,
+    color: colors.ink,
   },
   panelCopy: {
     marginTop: 8,
     maxWidth: 190,
-    fontSize: 10,
-    lineHeight: 16,
+    fontSize: 13,
+    lineHeight: 20,
     fontFamily: fonts.regular,
-    color: "#D4C1AE",
+    color: colors.muted,
   },
   panelButton: {
     minHeight: 44,
     marginTop: 15,
     paddingHorizontal: 13,
-    borderRadius: 1,
-    backgroundColor: colors.goldLight,
+    borderRadius: radius.sm,
+    backgroundColor: colors.soil,
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
@@ -407,27 +384,27 @@ const s = StyleSheet.create({
   panelButtonText: {
     fontSize: 11,
     fontFamily: fonts.bold,
-    color: colors.soilDark,
+    color: colors.paper,
   },
-  panelButtonArrow: { marginLeft: 16, fontSize: 17, color: colors.soilDark },
+  panelButtonArrow: { marginLeft: 16, fontSize: 17, color: colors.paper },
   moleWrap: {
-    width: 154,
+    width: 136,
     alignSelf: "flex-end",
     marginRight: -4,
     marginBottom: -7,
   },
   sectionHead: {
-    marginTop: 29,
-    marginBottom: 12,
+    marginTop: 36,
+    marginBottom: 14,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: 12,
   },
-  sectionTitle: { fontSize: 18, fontFamily: fonts.bold, color: colors.ink },
+  sectionTitle: { fontSize: 20, fontFamily: fonts.bold, color: colors.ink },
   sectionSub: {
     marginTop: 3,
-    fontSize: 9,
+    fontSize: 12,
     fontFamily: fonts.regular,
     color: colors.muted,
   },
@@ -435,13 +412,15 @@ const s = StyleSheet.create({
     paddingVertical: 3,
     fontSize: 9,
     fontFamily: fonts.bold,
-    color: colors.green,
+    color: colors.soil,
   },
   lenses: {
     flexDirection: "column",
     gap: 0,
-    borderTopWidth: 2,
-    borderColor: colors.ink,
+    paddingHorizontal: 16,
+    borderRadius: radius.lg,
+    backgroundColor: colors.cream,
+    overflow: "hidden",
   },
   lensesCompact: {
     flexDirection: "column",
@@ -452,11 +431,11 @@ const s = StyleSheet.create({
   lens: {
     flex: 0,
     minHeight: 72,
-    paddingHorizontal: 2,
+    paddingHorizontal: 0,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderColor: colors.line,
-    backgroundColor: "transparent",
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -479,13 +458,12 @@ const s = StyleSheet.create({
     height: 34,
     minHeight: 34,
     marginRight: 13,
-    borderRadius: 1,
-    borderWidth: 1,
-    borderColor: colors.line,
+    borderRadius: 12,
+    backgroundColor: colors.paper,
     alignItems: "center",
     justifyContent: "center",
   },
-  lensMark: { fontSize: 17, fontFamily: fonts.bold, color: colors.green },
+  lensMark: { fontSize: 17, fontFamily: fonts.bold, color: colors.soil },
   lensTitle: {
     marginTop: 11,
     fontSize: 12,
@@ -500,16 +478,15 @@ const s = StyleSheet.create({
     color: colors.muted,
   },
   lensBodyCompact: { flex: 1 },
-  lensTitleCompact: { marginTop: 0, fontSize: 13 },
+  lensTitleCompact: { marginTop: 0, fontSize: 15 },
   lensCopyCompact: { marginTop: 3, fontSize: 10, lineHeight: 14 },
-  lensArrow: { fontSize: 18, color: colors.gold },
+  lensArrow: { fontSize: 18, color: colors.muted },
   saved: {
     minHeight: 64,
     marginTop: 19,
     paddingHorizontal: 16,
-    borderLeftWidth: 4,
-    borderColor: colors.gold,
-    backgroundColor: colors.paper,
+    borderRadius: radius.md,
+    backgroundColor: colors.cream,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -523,8 +500,8 @@ const s = StyleSheet.create({
   },
   savedArrow: { fontSize: 20, color: colors.green },
   stockRow: {
-    minHeight: 70,
-    borderTopWidth: 1,
+    minHeight: 76,
+    borderBottomWidth: 1,
     borderColor: colors.line,
     flexDirection: "row",
     alignItems: "center",
@@ -555,12 +532,18 @@ const s = StyleSheet.create({
     height: 59,
     marginBottom: 8,
     borderRadius: 12,
-    backgroundColor: "#E7DCC8",
+    backgroundColor: colors.cream,
   },
   errorBox: { padding: 16, borderRadius: 13, backgroundColor: "#EBD9CC" },
   errorTitle: { fontSize: 12, fontWeight: "900", color: colors.danger },
   errorText: { marginTop: 4, fontSize: 10, color: colors.muted },
-  links: { marginTop: 27, borderTopWidth: 2, borderColor: colors.ink },
+  links: {
+    marginTop: 32,
+    paddingHorizontal: 16,
+    borderRadius: radius.lg,
+    backgroundColor: colors.cream,
+    overflow: "hidden",
+  },
   linkRow: {
     minHeight: 72,
     borderBottomWidth: 1,

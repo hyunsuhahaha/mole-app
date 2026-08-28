@@ -98,7 +98,7 @@ export default function StockDetail() {
           />
           <Section
             label="지금 확인할 수 있는 범위"
-            text="국내 상장 종목 목록과 가격 흐름을 확인했어요. 국내 기업의 매출·이익 조건 검색은 OpenDART 재무자료가 연결된 뒤에만 제공해 잘못된 후보를 만들지 않아요."
+            text="가격 흐름을 볼 수 있어요. 재무 분석은 준비 중이에요."
             accent
           />
           <Text style={s.domesticNotice}>
@@ -130,10 +130,10 @@ export default function StockDetail() {
           </Text>
           <Text style={s.missingText}>
             {detail.isLoading
-              ? "매출, 이익과 주식 수 변화를 쉬운 말로 바꾸는 중이에요."
+              ? "잠시만 기다려주세요."
               : detail.error instanceof Error
                 ? detail.error.message
-                : "샘플 설명으로 대신하지 않았어요. 검색 결과에서 회사를 다시 선택해주세요."}
+                : "검색 결과에서 회사를 다시 골라주세요."}
           </Text>
         </View>
       </SafeAreaView>
@@ -391,7 +391,7 @@ function Section({
   );
 }
 const s = StyleSheet.create({
-  page: { flex: 1, backgroundColor: colors.cream },
+  page: { flex: 1, backgroundColor: colors.paper },
   header: {
     marginHorizontal: spacing.lg,
     paddingVertical: 14,
@@ -411,12 +411,12 @@ const s = StyleSheet.create({
     marginLeft: "auto",
     paddingHorizontal: 10,
     paddingVertical: 7,
-    borderRadius: 1,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.line,
   },
-  watchActive: { backgroundColor: colors.green, borderColor: colors.green },
-  watchText: { fontSize: 9, fontWeight: "900", color: colors.green },
+  watchActive: { backgroundColor: colors.soil, borderColor: colors.soil },
+  watchText: { fontSize: 9, fontWeight: "900", color: colors.soil },
   watchTextActive: { color: colors.paper },
   step: { marginLeft: "auto", fontSize: 11, color: colors.muted },
   content: {
@@ -437,8 +437,6 @@ const s = StyleSheet.create({
   identity: {
     flexDirection: "row",
     paddingBottom: 20,
-    borderBottomWidth: 3,
-    borderColor: colors.ink,
   },
   ticker: { fontSize: 42, fontWeight: "900", color: colors.ink },
   company: { fontSize: 13, color: colors.muted },
@@ -447,9 +445,9 @@ const s = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 1,
-    backgroundColor: colors.green,
-    color: colors.paper,
+    borderRadius: 8,
+    backgroundColor: colors.cream,
+    color: colors.soil,
     fontSize: 10,
     fontWeight: "900",
   },
@@ -494,12 +492,10 @@ const s = StyleSheet.create({
     marginBottom: 10,
   },
   evidence: {
-    backgroundColor: colors.paper,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.gold,
+    backgroundColor: colors.cream,
+    borderRadius: 14,
     padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.line,
+    marginBottom: 10,
   },
   evidenceLabel: { fontSize: 12, fontWeight: "800", color: colors.ink },
   evidenceValue: {
@@ -591,14 +587,13 @@ const s = StyleSheet.create({
     backgroundColor: colors.soil,
     paddingHorizontal: 7,
     paddingVertical: 4,
-    borderRadius: 1,
+    borderRadius: 6,
   },
   sourceText: { fontSize: 10, color: colors.muted, flex: 1 },
   danger: {
     padding: 18,
-    backgroundColor: "#EBD9CC",
-    borderLeftWidth: 4,
-    borderColor: colors.danger,
+    backgroundColor: "#FFF0F1",
+    borderRadius: 16,
     marginTop: 12,
   },
   dangerLabel: { fontSize: 10, fontWeight: "900", color: colors.danger },
@@ -613,9 +608,7 @@ const s = StyleSheet.create({
     marginTop: 24,
     backgroundColor: colors.soilDark,
     padding: 18,
-    borderRadius: 1,
-    borderLeftWidth: 5,
-    borderColor: colors.gold,
+    borderRadius: 20,
   },
   riskHead: { flexDirection: "row", alignItems: "center" },
   riskKicker: { fontSize: 10, fontWeight: "900", color: colors.goldLight },
@@ -625,7 +618,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.goldLight,
     justifyContent: "center",
     paddingHorizontal: 14,
-    borderRadius: 1,
+    borderRadius: 12,
   },
   riskButtonText: { fontSize: 14, fontWeight: "900", color: colors.soilDark },
   riskLine: {

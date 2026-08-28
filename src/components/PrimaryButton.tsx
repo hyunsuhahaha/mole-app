@@ -16,21 +16,18 @@ export function PrimaryButton({
       style={({ pressed }) => [s.button, pressed && s.pressed, style]}
     >
       <Text style={s.text}>{label}</Text>
-      <Text style={s.arrow}>→</Text>
     </Pressable>
   );
 }
 const s = StyleSheet.create({
   button: {
     minHeight: 58,
-    backgroundColor: colors.ink,
-    borderRadius: 1,
-    borderTopWidth: 3,
-    borderColor: colors.gold,
+    backgroundColor: colors.soil,
+    borderRadius: 16,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
   pressed: { transform: [{ translateY: 2 }], opacity: 0.9 },
   text: {
@@ -39,5 +36,4 @@ const s = StyleSheet.create({
     fontFamily: fonts.bold,
     letterSpacing: 0.3,
   },
-  arrow: { color: colors.goldLight, fontSize: 24 },
 });
