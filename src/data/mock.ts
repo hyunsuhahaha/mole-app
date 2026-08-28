@@ -2,12 +2,16 @@ export type Evidence = {
   label: string;
   value: string;
   source: string;
-  sourceType: "10-Q" | "Earnings" | "Filing" | "Clinical";
+  sourceType: string;
+  explanation?: string;
+  tone?: "good" | "watch" | "neutral";
   url?: string | null;
 };
 export type StockResult = {
   ticker: string;
   company: string;
+  business?: string;
+  revenueHistory?: { period: string; value: number; display: string }[];
   score: number;
   preRiskScore: number;
   reason: string;
@@ -20,6 +24,9 @@ export type StockResult = {
   riskFindings: string[];
   dataSource?: string;
   asOf?: string;
+  matchStatus?: "exact" | "closest";
+  missedConditions?: string[];
+  coverageNote?: string;
 };
 export type DigStage = {
   count: number;

@@ -1,4 +1,73 @@
-import{View,StyleSheet}from'react-native';import Animated,{useAnimatedStyle,withRepeat,withSequence,withTiming}from'react-native-reanimated';import{colors}from'../theme/tokens';
-export type MoleMood='idle'|'digging'|'suspicious'|'danger'|'excited'|'found';
-export function Mole({mood='idle',size=180}:{mood?:MoleMood;size?:number}){const arm=useAnimatedStyle(()=>({transform:[{rotate:mood==='digging'?withRepeat(withSequence(withTiming('-24deg',{duration:150}),withTiming('22deg',{duration:150})),-1,true):'0deg'}]}));return <View accessibilityLabel={`Mole mascot is ${mood}`} style={[s.frame,{width:size,height:size*.78}]}><View style={[s.body,{width:size*.72,height:size*.68,borderRadius:size}]}><View style={[s.ear,s.earLeft]}/><View style={[s.ear,s.earRight]}/><View style={s.face}><View style={s.eye}/><View style={s.eye}/><View style={s.snout}><View style={s.nose}/></View></View><View style={s.chain}><View style={s.medal}/></View><Animated.View style={[s.arm,s.armLeft,arm]}/><Animated.View style={[s.arm,s.armRight,arm]}/></View><View style={[s.ground,{width:size}]}/></View>}
-const s=StyleSheet.create({frame:{alignItems:'center',justifyContent:'flex-end'},body:{backgroundColor:'#76503B',alignItems:'center',borderWidth:3,borderColor:colors.soilDark,overflow:'visible'},ear:{position:'absolute',top:8,width:32,height:32,borderRadius:20,backgroundColor:'#A8785E',borderWidth:3,borderColor:colors.soilDark},earLeft:{left:12},earRight:{right:12},face:{marginTop:30,flexDirection:'row',gap:35},eye:{width:9,height:13,borderRadius:8,backgroundColor:colors.ink},snout:{position:'absolute',top:18,left:9,width:44,height:34,borderRadius:22,backgroundColor:'#D7A58A',alignItems:'center',paddingTop:7},nose:{width:17,height:12,borderRadius:9,backgroundColor:colors.ink},chain:{position:'absolute',top:78,width:85,height:36,borderBottomWidth:5,borderColor:colors.gold,borderRadius:40,alignItems:'center'},medal:{position:'absolute',bottom:-12,width:25,height:25,borderRadius:15,backgroundColor:colors.goldLight,borderWidth:3,borderColor:colors.gold},arm:{position:'absolute',top:82,width:55,height:25,borderRadius:20,backgroundColor:'#8B614A',borderWidth:3,borderColor:colors.soilDark},armLeft:{left:-20},armRight:{right:-20},ground:{height:18,borderRadius:50,backgroundColor:colors.soilDark,marginTop:-8}});
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+
+export type MoleMood = "idle" | "digging" | "suspicious" | "danger" | "excited" | "found";
+
+const images = {
+  idle: require("../../assets/moles/mole-idle.png"),
+  digging: require("../../assets/moles/mole-digging.png"),
+  suspicious: require("../../assets/moles/mole-suspicious.png"),
+  danger: require("../../assets/moles/mole-danger.png"),
+  excited: require("../../assets/moles/mole-found.png"),
+  found: require("../../assets/moles/mole-found.png"),
+} as const;
+
+const labels: Record<MoleMood, string> = {
+  idle: "웃고 있는 두더지",
+  digging: "열심히 땅을 파는 두더지",
+  suspicious: "자료를 의심해 보는 두더지",
+  danger: "위험을 발견한 두더지",
+  excited: "기뻐하는 두더지",
+  found: "회사를 찾아낸 두더지",
+};
+
+export function Mole({ mood = "idle", size = 180 }: { mood?: MoleMood; size?: number }) {
+  const motion = useSharedValue(0);
+
+  useEffect(() => {
+    motion.value = 0;
+    const duration = mood === "digging" ? 180 : mood === "danger" ? 260 : 850;
+    motion.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration, easing: Easing.inOut(Easing.ease) }),
+        withTiming(0, { duration, easing: Easing.inOut(Easing.ease) }),
+      ),
+      -1,
+      false,
+    );
+    return () => cancelAnimation(motion);
+  }, [mood, motion]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    const digging = mood === "digging";
+    const alert = mood === "danger";
+    const celebrating = mood === "found" || mood === "excited";
+    return {
+      transform: [
+        { translateY: digging ? motion.value * 5 : celebrating ? -motion.value * 3 : -motion.value * 1.5 },
+        { rotate: alert ? `${(motion.value - 0.5) * 3}deg` : "0deg" },
+        { scale: celebrating ? 1 + motion.value * 0.025 : 1 },
+      ],
+    };
+  });
+
+  return (
+    <View accessibilityLabel={labels[mood]} style={[styles.frame, { width: size, height: size }]}>
+      <Animated.Image source={images[mood]} resizeMode="contain" style={[styles.image, animatedStyle]} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  frame: { alignItems: "center", justifyContent: "center", overflow: "visible" },
+  image: { width: "100%", height: "100%" },
+});

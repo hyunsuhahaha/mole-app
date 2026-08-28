@@ -12,16 +12,16 @@ USER_AGENT = os.getenv("SEC_USER_AGENT", "")
 
 class SecClient:
     def __init__(self) -> None:
-        if not USER_AGENT or "@" not in USER_AGENT:
-            raise RuntimeError('SEC_USER_AGENT must include the app name and a contact email, e.g. "Stock Digger you@example.com"')
         self._client = httpx.AsyncClient(
-            headers={"User-Agent": USER_AGENT, "Accept-Encoding": "gzip, deflate"},
+            headers={"User-Agent": USER_AGENT or "Stock Digger (configure SEC_USER_AGENT)", "Accept-Encoding": "gzip, deflate"},
             timeout=20,
         )
         self._cache: dict[str, tuple[float, Any]] = {}
         self._lock = asyncio.Lock()
 
     async def get_json(self, path: str) -> dict[str, Any]:
+        if not USER_AGENT or "@" not in USER_AGENT:
+            raise RuntimeError('SEC_USER_AGENT must include the app name and a contact email before live SEC access')
         cached = self._cache.get(path)
         if cached and time.time() - cached[0] < 900:
             return cached[1]

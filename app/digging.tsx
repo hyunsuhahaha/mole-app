@@ -20,13 +20,15 @@ export default function Digging() {
   const [stage, setStage] = useState(0),
     [open, setOpen] = useState<number | null>(null);
   const filters = useDigStore((x) => x.filters),
+    profile = useDigStore((x) => x.screeningProfile),
+    riskProfile = useDigStore((x) => x.riskProfile),
     setDigData = useDigStore((x) => x.setDigData),
     storedStages = useDigStore((x) => x.digStages);
   const depth = useSharedValue(0),
     dirt = useSharedValue(0);
   const { data, error, isLoading } = useQuery({
-    queryKey: ["sec-screen", filters],
-    queryFn: () => researchApi.runScreen(filters),
+    queryKey: ["sec-screen", filters, profile, riskProfile],
+    queryFn: () => researchApi.runScreen(filters, profile, riskProfile),
     retry: 1,
   });
   const stages = data?.stages ?? storedStages;
@@ -70,21 +72,25 @@ export default function Digging() {
               : isLoading
                 ? "회사 자료를\n읽고 있어요."
                 : complete
-                  ? `${data.results.length}개가 끝까지\n살아남았어요.`
+                  ? data.resultMode === "exact"
+                    ? `${data.exactMatchCount}개가 조건을\n정확히 통과했어요.`
+                    : data.coverageComplete
+                      ? `정확히 맞는 종목은 0개,\n가까운 후보를 찾았어요.`
+                      : `확인한 가격 후보에서는 0개,\n가까운 후보를 찾았어요.`
                   : "숫자를 쉽게\n비교하고 있어요."}
           </Text>
           <Text style={s.hint}>
             {error
               ? "PC에서 데이터 서버를 먼저 켜주세요."
               : data
-                ? `${data.scope} · ${data.source}`
+                ? `${data.scope} · ${data.source}${data.priceCheckedCount ? ` · 가격 ${data.priceCheckedCount}개 확인` : ""}`
                 : "회사가 제출한 최신 자료 확인 중"}
           </Text>
         </View>
         <Animated.View style={moleStyle}>
           <Mole
             mood={error ? "danger" : complete ? "found" : "digging"}
-            size={110}
+            size={138}
           />
           <Animated.Text style={[s.dirt, dirtStyle]}>•• • ••</Animated.Text>
         </Animated.View>
@@ -152,8 +158,20 @@ export default function Digging() {
       {complete && data.results.length > 0 && (
         <View style={s.footer}>
           <PrimaryButton
-            label={`남은 ${data.results.length}개 쉽게 보기`}
+            label={data.resultMode === "exact" ? `통과한 ${data.results.length}개 쉽게 보기` : `가까운 후보 ${data.results.length}개와 부족한 조건 보기`}
             onPress={() => router.push("/results")}
+          />
+        </View>
+      )}
+      {complete && data.results.length === 0 && (
+        <View style={s.footer}>
+          <Text style={s.emptyTitle}>조건을 통과한 후보가 없어요</Text>
+          <Text style={s.emptyText}>
+            나쁜 결과가 아니라 조건이 좁다는 뜻이에요. 한 가지씩만 넓혀보세요.
+          </Text>
+          <PrimaryButton
+            label="조건 한 단계 넓히기"
+            onPress={() => router.replace(profile ? "/conversation" : "/setup")}
           />
         </View>
       )}
@@ -252,6 +270,8 @@ const s = StyleSheet.create({
   },
   rejectReason: { flex: 1, fontSize: 12, color: colors.paper },
   footer: { padding: spacing.md, backgroundColor: colors.cream },
+  emptyTitle: { fontSize: 15, fontWeight: "900", color: colors.ink },
+  emptyText: { marginVertical: 7, fontSize: 11, lineHeight: 17, color: colors.muted },
   errorBox: {
     margin: spacing.lg,
     padding: 20,

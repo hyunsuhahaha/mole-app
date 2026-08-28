@@ -16,6 +16,7 @@
     "react-native": "0.86.3",
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
     "react-native-web": "^0.21.2",
     "react-native-worklets": "0.10.1",
     "zustand": "^5.0.15"
@@ -28,6 +29,13 @@
   "scripts": {
     "start": "expo start",
     "typecheck": "tsc --noEmit",
+    "check:screener": "node --experimental-strip-types scripts/check-screener.mjs",
+    "check:engine": "cd server && python check_engine.py",
+    "check:repository": "cd server && python check_repository.py",
+    "check:api": "cd server && python check_api.py",
+    "check:market": "cd server && python check_market_data.py",
+    "check:chart": "node --experimental-strip-types scripts/check-finance-chart.ts",
+    "sync:sec": "cd server && python sync_sec.py",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"

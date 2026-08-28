@@ -8,4 +8,4 @@ python -m pip install -r server/requirements.txt
 python -m uvicorn server.app.main:app --reload --port 8001 --env-file .env
 ```
 
-The current real-data universe is intentionally limited to eight US-listed companies while the Dig Engine is validated. Market price, market cap, one-year return, and future catalyst filters are not inferred from SEC filings.
+The local SEC snapshot currently covers thousands of US-listed reporting companies. Toss Securities Open API is the primary KR/US quote, candle, and Korean stock-directory provider when `TOSS_INVEST_CLIENT_ID` and `TOSS_INVEST_CLIENT_SECRET` are configured. Twelve Data remains a fallback. SEC EDGAR and OpenDART remain the sources for company financial statements.

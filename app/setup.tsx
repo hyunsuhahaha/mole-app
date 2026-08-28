@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useDigStore, Filters } from "../src/store/useDigStore";
 import { PrimaryButton } from "../src/components/PrimaryButton";
 import { colors, spacing } from "../src/theme/tokens";
+import { goBackOr } from "../src/navigation/goBackOr";
 const basic: [keyof Filters, string, string[]][] = [
   [
     "style",
@@ -76,13 +77,18 @@ function ChoiceGroup({
   );
 }
 export default function Setup() {
+  const riskProfile = useDigStore((state) => state.riskProfile);
+  useEffect(() => {
+    if (!riskProfile) router.replace("/profile?next=setup");
+  }, [riskProfile]);
+  if (!riskProfile) return null;
   const [deep, setDeep] = useState(false);
   return (
     <SafeAreaView style={s.page}>
       <View style={s.header}>
         <Pressable
           accessibilityLabel="뒤로 가기"
-          onPress={() => router.back()}
+          onPress={() => goBackOr("/")}
           hitSlop={12}
         >
           <Text style={s.back}>←</Text>

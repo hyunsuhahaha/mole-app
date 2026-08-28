@@ -12,6 +12,8 @@ build-apk/
 __pycache__/
 *.py[cod]
 .venv/
+server/data/*.db*
+dist-release/
 build/
 .next/
 
