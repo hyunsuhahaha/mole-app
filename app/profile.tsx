@@ -31,17 +31,37 @@ export default function Profile() {
   return (
     <SafeAreaView style={s.page}>
       <View style={s.header}>
-        <Pressable accessibilityLabel="뒤로 가기" accessibilityRole="button" hitSlop={12} onPress={() => goBackOr("/")}>
+        <Pressable
+          accessibilityLabel="뒤로 가기"
+          accessibilityRole="button"
+          hitSlop={12}
+          onPress={() => goBackOr("/")}
+        >
           <Text style={s.back}>←</Text>
         </Pressable>
         <View>
           <Text style={s.kicker}>먼저 나부터 파악하기</Text>
           <Text style={s.headerTitle}>나의 투자 탐색 성향</Text>
         </View>
-        <Text style={s.progress}>{complete ? "완료" : `${step + 1} / ${riskQuestions.length}`}</Text>
+        <Text style={s.progress}>
+          {complete ? "완료" : `${step + 1} / ${riskQuestions.length}`}
+        </Text>
+      </View>
+      <View style={s.progressTrack}>
+        <View
+          style={[
+            s.progressFill,
+            {
+              width: `${complete ? 100 : ((step + 1) / riskQuestions.length) * 100}%`,
+            },
+          ]}
+        />
       </View>
 
-      <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={s.content}
+        showsVerticalScrollIndicator={false}
+      >
         {complete ? (
           <>
             <Text style={s.eyebrow}>현재 답변으로 본 성향</Text>
@@ -59,9 +79,16 @@ export default function Profile() {
             </View>
             <View style={s.notice}>
               <Text style={s.noticeTitle}>꼭 알아두세요</Text>
-              <Text style={s.noticeText}>이 결과는 정식 투자성향 진단이나 매수 추천이 아니에요. 지금 답변에 맞춰 후보를 설명하고 정렬하는 용도예요.</Text>
+              <Text style={s.noticeText}>
+                이 결과는 정식 투자성향 진단이나 매수 추천이 아니에요. 지금
+                답변에 맞춰 후보를 설명하고 정렬하는 용도예요.
+              </Text>
             </View>
-            <Pressable accessibilityRole="button" onPress={() => setStep(riskQuestions.length - 1)} style={s.previous}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setStep(riskQuestions.length - 1)}
+              style={s.previous}
+            >
               <Text style={s.previousText}>← 마지막 답변 고치기</Text>
             </Pressable>
           </>
@@ -71,8 +98,16 @@ export default function Profile() {
             <Text style={s.question}>{question.text}</Text>
             <Text style={s.help}>{question.help}</Text>
             <View style={s.options}>
-              {question.options.map((option) => (
-                <Pressable key={option.value} accessibilityRole="button" onPress={() => answer(option.value)} style={({ pressed }) => [s.option, pressed && s.pressed]}>
+              {question.options.map((option, index) => (
+                <Pressable
+                  key={option.value}
+                  accessibilityRole="button"
+                  onPress={() => answer(option.value)}
+                  style={({ pressed }) => [s.option, pressed && s.pressed]}
+                >
+                  <Text style={s.optionIndex}>
+                    {String(index + 1).padStart(2, "0")}
+                  </Text>
                   <View style={s.optionBody}>
                     <Text style={s.optionLabel}>{option.label}</Text>
                     <Text style={s.optionNote}>{option.note}</Text>
@@ -82,45 +117,150 @@ export default function Profile() {
               ))}
             </View>
             {step > 0 && (
-              <Pressable accessibilityRole="button" onPress={() => setStep((current) => current - 1)} style={s.previous}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setStep((current) => current - 1)}
+                style={s.previous}
+              >
                 <Text style={s.previousText}>← 이전 질문</Text>
               </Pressable>
             )}
           </>
         )}
       </ScrollView>
-      {complete && <View style={s.footer}><PrimaryButton label={next === "setup" ? "이 성향으로 조건 직접 고르기" : "이 성향으로 회사 찾기"} onPress={continueToSearch} /></View>}
+      {complete && (
+        <View style={s.footer}>
+          <PrimaryButton
+            label={
+              next === "setup"
+                ? "이 성향으로 조건 직접 고르기"
+                : "이 성향으로 회사 찾기"
+            }
+            onPress={continueToSearch}
+          />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.cream },
-  header: { minHeight: 70, marginHorizontal: spacing.lg, borderBottomWidth: 2, borderColor: colors.ink, flexDirection: "row", alignItems: "center", gap: 14 },
+  header: {
+    minHeight: 70,
+    marginHorizontal: spacing.lg,
+    borderBottomWidth: 2,
+    borderColor: colors.ink,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+  },
   back: { fontSize: 27, color: colors.ink },
-  kicker: { color: colors.green, fontSize: 10, fontWeight: "900", letterSpacing: 1.4 },
+  kicker: {
+    color: colors.green,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.4,
+  },
   headerTitle: { color: colors.ink, fontSize: 20, fontWeight: "900" },
   progress: { marginLeft: "auto", fontSize: 11, color: colors.muted },
+  progressTrack: {
+    height: 3,
+    marginHorizontal: spacing.lg,
+    backgroundColor: colors.line,
+    overflow: "hidden",
+  },
+  progressFill: { height: "100%", backgroundColor: colors.gold },
   content: { padding: spacing.lg, paddingBottom: 40 },
-  eyebrow: { marginTop: 18, color: colors.green, fontSize: 10, fontWeight: "900", letterSpacing: 1.3 },
-  question: { marginTop: 9, fontSize: 31, lineHeight: 37, fontWeight: "900", color: colors.ink },
+  eyebrow: {
+    marginTop: 18,
+    color: colors.green,
+    fontSize: 10,
+    fontWeight: "900",
+    letterSpacing: 1.3,
+  },
+  question: {
+    marginTop: 9,
+    fontSize: 31,
+    lineHeight: 37,
+    fontWeight: "900",
+    color: colors.ink,
+  },
   help: { marginTop: 10, fontSize: 13, lineHeight: 20, color: colors.muted },
-  options: { marginTop: 25, gap: 10 },
-  option: { minHeight: 78, paddingHorizontal: 17, borderRadius: 14, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.paper, flexDirection: "row", alignItems: "center" },
-  pressed: { backgroundColor: "#E8DDC6", transform: [{ translateY: 1 }] },
+  options: {
+    marginTop: 25,
+    borderTopWidth: 2,
+    borderColor: colors.ink,
+  },
+  option: {
+    minHeight: 82,
+    paddingHorizontal: 2,
+    borderBottomWidth: 1,
+    borderColor: colors.line,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  pressed: { backgroundColor: "#E8DDC6" },
+  optionIndex: {
+    width: 38,
+    marginRight: 9,
+    fontSize: 10,
+    fontWeight: "900",
+    color: colors.gold,
+    fontVariant: ["tabular-nums"],
+  },
   optionBody: { flex: 1 },
   optionLabel: { fontSize: 14, fontWeight: "900", color: colors.ink },
-  optionNote: { marginTop: 5, fontSize: 11, lineHeight: 16, color: colors.muted },
+  optionNote: {
+    marginTop: 5,
+    fontSize: 11,
+    lineHeight: 16,
+    color: colors.muted,
+  },
   arrow: { marginLeft: 10, color: colors.gold, fontSize: 20 },
   previous: { alignSelf: "flex-start", paddingVertical: 20 },
   previousText: { color: colors.muted, fontSize: 12, fontWeight: "800" },
-  resultTitle: { marginTop: 9, fontSize: 39, lineHeight: 45, fontWeight: "900", color: colors.ink },
-  resultSummary: { marginTop: 13, fontSize: 16, lineHeight: 24, fontWeight: "700", color: colors.soil },
-  resultBox: { marginTop: 25, padding: 18, borderRadius: 14, borderWidth: 2, borderColor: colors.green, backgroundColor: colors.paper },
+  resultTitle: {
+    marginTop: 9,
+    fontSize: 39,
+    lineHeight: 45,
+    fontWeight: "900",
+    color: colors.ink,
+  },
+  resultSummary: {
+    marginTop: 13,
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: "700",
+    color: colors.soil,
+  },
+  resultBox: {
+    marginTop: 25,
+    padding: 18,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: colors.green,
+    backgroundColor: colors.paper,
+  },
   resultBoxTitle: { fontSize: 12, fontWeight: "900", color: colors.green },
-  resultBoxText: { marginTop: 7, fontSize: 13, lineHeight: 20, color: colors.ink },
-  notice: { marginTop: 13, padding: 15, borderRadius: 12, backgroundColor: "#E8DDC6" },
+  resultBoxText: {
+    marginTop: 7,
+    fontSize: 13,
+    lineHeight: 20,
+    color: colors.ink,
+  },
+  notice: {
+    marginTop: 13,
+    padding: 15,
+    borderRadius: 12,
+    backgroundColor: "#E8DDC6",
+  },
   noticeTitle: { fontSize: 11, fontWeight: "900", color: colors.ink },
-  noticeText: { marginTop: 5, fontSize: 10, lineHeight: 16, color: colors.muted },
+  noticeText: {
+    marginTop: 5,
+    fontSize: 10,
+    lineHeight: 16,
+    color: colors.muted,
+  },
   footer: { padding: spacing.md, borderTopWidth: 1, borderColor: colors.line },
 });
