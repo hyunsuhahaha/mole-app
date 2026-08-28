@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createJSONStorage, persist } from "zustand/middleware";
 import { stages as demoStages } from "../data/mock";
 import type { StockResult, DigStage } from "../data/mock";
 import type { RiskProfile } from "../data/riskProfile";
@@ -26,6 +28,7 @@ export type ScreeningProfile = {
   unknownCount: number;
 };
 type State = {
+  hasHydrated: boolean;
   filters: Filters;
   riskProfile: RiskProfile | null;
   screeningProfile: ScreeningProfile | null;
@@ -37,6 +40,7 @@ type State = {
   setScreeningProfile: (profile: ScreeningProfile) => void;
   setDigData: (r: StockResult[], s: DigStage[]) => void;
   toggleWatchlist: (ticker: string) => void;
+  setHasHydrated: (value: boolean) => void;
   reset: () => void;
 };
 const defaults: Filters = {
@@ -51,30 +55,47 @@ const defaults: Filters = {
   cashRunway: "18개월 이상",
   catalyst: "꼭 있어야 함",
 };
-export const useDigStore = create<State>((set) => ({
-  filters: defaults,
-  riskProfile: null,
-  screeningProfile: null,
-  results: [],
-  digStages: demoStages,
-  watchlist: [],
-  setFilter: (key, value) =>
-    set((s) => ({ filters: { ...s.filters, [key]: value } })),
-  setRiskProfile: (riskProfile) => set({ riskProfile }),
-  setScreeningProfile: (screeningProfile) => set({ screeningProfile }),
-  setDigData: (results, digStages) => set({ results, digStages }),
-  toggleWatchlist: (ticker) => set((state) => ({
-    watchlist: state.watchlist.includes(ticker)
-      ? state.watchlist.filter((item) => item !== ticker)
-      : [...state.watchlist, ticker],
-  })),
-  reset: () =>
-    set({
+export const useDigStore = create<State>()(
+  persist(
+    (set) => ({
+      hasHydrated: false,
       filters: defaults,
       riskProfile: null,
       screeningProfile: null,
       results: [],
       digStages: demoStages,
       watchlist: [],
+      setFilter: (key, value) =>
+        set((s) => ({ filters: { ...s.filters, [key]: value } })),
+      setRiskProfile: (riskProfile) => set({ riskProfile }),
+      setScreeningProfile: (screeningProfile) => set({ screeningProfile }),
+      setDigData: (results, digStages) => set({ results, digStages }),
+      toggleWatchlist: (ticker) =>
+        set((state) => ({
+          watchlist: state.watchlist.includes(ticker)
+            ? state.watchlist.filter((item) => item !== ticker)
+            : [...state.watchlist, ticker],
+        })),
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
+      reset: () =>
+        set({
+          filters: defaults,
+          riskProfile: null,
+          screeningProfile: null,
+          results: [],
+          digStages: demoStages,
+          watchlist: [],
+        }),
     }),
-}));
+    {
+      name: "stock-digger-preferences",
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        filters: state.filters,
+        riskProfile: state.riskProfile,
+        watchlist: state.watchlist,
+      }),
+      onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
+    },
+  ),
+);

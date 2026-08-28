@@ -73,7 +73,7 @@ export default function Digging() {
                 ? "회사 자료를\n읽고 있어요."
                 : complete
                   ? data.resultMode === "exact"
-                    ? `${data.exactMatchCount}개가 조건을\n정확히 통과했어요.`
+                    ? `${data.exactMatchCount}개가 자동 조건을\n통과했어요.`
                     : data.coverageComplete
                       ? `정확히 맞는 종목은 0개,\n가까운 후보를 찾았어요.`
                       : `확인한 가격 후보에서는 0개,\n가까운 후보를 찾았어요.`
@@ -158,7 +158,11 @@ export default function Digging() {
       {complete && data.results.length > 0 && (
         <View style={s.footer}>
           <PrimaryButton
-            label={data.resultMode === "exact" ? `통과한 ${data.results.length}개 쉽게 보기` : `가까운 후보 ${data.results.length}개와 부족한 조건 보기`}
+            label={
+              data.resultMode === "exact"
+                ? `자동 조건을 통과한 ${data.results.length}개 보기`
+                : `가까운 후보 ${data.results.length}개와 부족한 조건 보기`
+            }
             onPress={() => router.push("/results")}
           />
         </View>
@@ -271,7 +275,12 @@ const s = StyleSheet.create({
   rejectReason: { flex: 1, fontSize: 12, color: colors.paper },
   footer: { padding: spacing.md, backgroundColor: colors.cream },
   emptyTitle: { fontSize: 15, fontWeight: "900", color: colors.ink },
-  emptyText: { marginVertical: 7, fontSize: 11, lineHeight: 17, color: colors.muted },
+  emptyText: {
+    marginVertical: 7,
+    fontSize: 11,
+    lineHeight: 17,
+    color: colors.muted,
+  },
   errorBox: {
     margin: spacing.lg,
     padding: 20,

@@ -7,7 +7,8 @@ from app.repository import MetricsRepository
 def row(ticker: str, growth: float) -> dict:
     return {"ticker": ticker, "company": ticker, "cik": 1, "revenue_growth": growth,
             "cash": None, "dilution": None, "operating_income": None,
-            "filing_url": None, "filing_label": None}
+            "filing_url": None, "filing_label": None,
+            "evidence_sources": {"revenue": {"form": "10-Q", "filed": "2026-01-01", "url": "https://www.sec.gov/revenue"}}}
 
 
 with TemporaryDirectory() as directory:
@@ -18,6 +19,7 @@ with TemporaryDirectory() as directory:
     loaded = repository.load_all()
     assert [item["ticker"] for item in loaded] == ["CCC"]
     assert loaded[0]["revenue_history"] == []
+    assert loaded[0]["evidence_sources"]["revenue"]["form"] == "10-Q"
     assert repository.find("CCC")["company"] == "CCC"
     assert repository.find("MISSING") is None
     assert [item["ticker"] for item in repository.search("CC")] == ["CCC"]

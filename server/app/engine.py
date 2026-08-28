@@ -49,6 +49,7 @@ class Metrics:
     dividend_per_share: float | None = None
     dividend_years: int | None = None
     dividend_growth: float | None = None
+    evidence_sources: dict[str, dict[str, Any]] | None = None
 
 
 def _taxonomy(facts: dict[str, Any]) -> dict[str, Any]:
@@ -148,6 +149,21 @@ def _date_num(value: str) -> int:
     return int(value.replace("-", ""))
 
 
+def _fact_source(cik: int, fact: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not fact:
+        return None
+    accession = fact.get("accn")
+    url = None
+    if accession:
+        clean = accession.replace("-", "")
+        url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{clean}/{accession}-index.html"
+    return {
+        "form": fact.get("form") or "SEC 자료",
+        "filed": fact.get("filed") or fact.get("end") or "날짜 미확인",
+        "url": url,
+    }
+
+
 def _latest_duration(items: list[dict[str, Any]]) -> dict[str, Any] | None:
     valid = [x for x in items if x.get("form") == "10-Q" and x.get("frame") and x.get("val") is not None]
     return max(valid, key=lambda x: (x.get("end", ""), x.get("filed", "")), default=None)
@@ -164,7 +180,19 @@ def metrics_from_facts(ticker: str, cik: int, facts: dict[str, Any]) -> Metrics:
     cash_fact = _latest_instant(_units(facts, CASH_TAGS, "USD"))
     shares = _units(facts, SHARE_TAGS, "shares")
     shares_fact = _latest_instant(shares)
-    dividend_per_share, dividend_years, dividend_growth = _annual_dividends(_units(facts, DIVIDEND_TAGS, "USD/shares"))
+    dividend_facts = _units(facts, DIVIDEND_TAGS, "USD/shares")
+    dividend_per_share, dividend_years, dividend_growth = _annual_dividends(dividend_facts)
+    dividend_fact = max(
+        (
+            item
+            for item in dividend_facts
+            if item.get("form") == "10-K"
+            and re.fullmatch(r"CY\d{4}", item.get("frame", ""))
+            and item.get("val") is not None
+        ),
+        key=lambda item: (item.get("filed", ""), item.get("end", "")),
+        default=None,
+    )
     operating = _latest_duration(_units(facts, ["OperatingIncomeLoss"], "USD"))
     filing_url = filing_label = None
     source_fact = max(
@@ -187,6 +215,17 @@ def metrics_from_facts(ticker: str, cik: int, facts: dict[str, Any]) -> Metrics:
         dividend_per_share=dividend_per_share, dividend_years=dividend_years,
         dividend_growth=dividend_growth, filing_url=filing_url, filing_label=filing_label,
         revenue_history=_quarter_history(revenue),
+        evidence_sources={
+            key: source
+            for key, source in {
+                "revenue": _fact_source(cik, revenue_fact),
+                "cash": _fact_source(cik, cash_fact),
+                "operating_income": _fact_source(cik, operating),
+                "dilution": _fact_source(cik, shares_fact),
+                "dividend": _fact_source(cik, dividend_fact),
+            }.items()
+            if source
+        },
     )
 
 
@@ -197,31 +236,64 @@ def _money(value: float | None) -> str:
 
 
 def to_result(m: Metrics) -> dict[str, Any]:
-    growth = m.revenue_growth or 0
+    growth = m.revenue_growth
+    growth_for_score = growth if growth is not None else 0
     dilution = m.dilution or 0
-    score = max(35, min(95, round(62 + growth * 0.55 - max(0, dilution) * 0.8 + (5 if (m.operating_income or 0) > 0 else 0))))
+    score = max(35, min(95, round(62 + growth_for_score * 0.55 - max(0, dilution) * 0.8 + (5 if (m.operating_income or 0) > 0 else 0))))
     risk_findings = []
     if dilution > 5: risk_findings.append(f"1년 동안 주식 수가 {dilution:.1f}% 늘었어요")
     if (m.operating_income or 0) < 0: risk_findings.append("최근 3개월은 영업 손실이에요")
     if not risk_findings: risk_findings.append("숫자에 나오지 않는 사업 위험도 확인해야 해요")
     evidence = []
-    filing_parts = (m.filing_label or "10-Q · 날짜 미확인").split(" · ")
-    source_type = {"10-Q":"3개월 보고서", "10-K":"1년 보고서", "20-F":"해외기업 1년 보고서"}.get(filing_parts[0], "회사 보고서")
-    source_label = f"{source_type} · {filing_parts[1]}" if len(filing_parts) > 1 else source_type
-    if m.revenue_growth is not None: evidence.append({"label":"1년 전보다 늘어난 매출","value":f"{m.revenue_growth:+.1f}%","explanation":f"최근 3개월 매출이 1년 전 같은 3개월보다 {abs(m.revenue_growth):.1f}% {'늘었어요' if m.revenue_growth >= 0 else '줄었어요'}.","tone":"good" if m.revenue_growth >= 10 else "watch","source":source_label,"sourceType":source_type,"url":m.filing_url})
-    if m.operating_income is not None: evidence.append({"label":"본업으로 번 돈","value":_money(m.operating_income),"explanation":"제품과 서비스를 팔아 운영비를 내고도 돈이 남았어요." if m.operating_income > 0 else "제품과 서비스를 판 돈보다 운영비가 더 많이 들었어요.","tone":"good" if m.operating_income > 0 else "watch","source":source_label,"sourceType":source_type,"url":m.filing_url})
-    if m.dilution is not None: evidence.append({"label":"1년 동안 주식 수 변화","value":f"{m.dilution:+.1f}%","explanation":"주식 수가 많이 늘면 기존 주주 한 명의 몫이 작아질 수 있어요.","tone":"good" if m.dilution <= 5 else "watch","source":source_label,"sourceType":source_type,"url":m.filing_url})
-    if m.cash is not None: evidence.append({"label":"회사가 가진 현금","value":_money(m.cash),"explanation":"급한 지출이나 성장을 위해 쓸 수 있는 돈이에요. 빚을 뺀 금액은 아니에요.","tone":"neutral","source":source_label,"sourceType":source_type,"url":m.filing_url})
-    if m.dividend_per_share is not None: evidence.append({"label":"최근 1년 주당 배당금","value":f"${m.dividend_per_share:.2f}","explanation":f"공시에서 최근 연간 배당 기록을 확인했어요. 이어진 기록은 약 {m.dividend_years or 0}년이에요.","tone":"good","source":source_label,"sourceType":source_type,"url":m.filing_url})
+
+    def source_for(key: str) -> tuple[str, str, str | None]:
+        source = (m.evidence_sources or {}).get(key)
+        if not source:
+            return "SEC Company Facts · 지표별 제출일 확인 필요", "SEC 자료", None
+        source_type = {"10-Q":"3개월 보고서", "10-K":"1년 보고서", "20-F":"해외기업 1년 보고서"}.get(source.get("form"), "회사 보고서")
+        return f"{source_type} · {source.get('filed', '날짜 미확인')}", source_type, source.get("url")
+
+    if m.revenue_growth is not None:
+        source_label, source_type, source_url = source_for("revenue")
+        evidence.append({"label":"1년 전보다 달라진 매출","value":f"{m.revenue_growth:+.1f}%","explanation":f"최근 3개월 매출이 1년 전 같은 3개월보다 {abs(m.revenue_growth):.1f}% {'늘었어요' if m.revenue_growth >= 0 else '줄었어요'}.","tone":"good" if m.revenue_growth >= 10 else "watch","source":source_label,"sourceType":source_type,"url":source_url})
+    if m.operating_income is not None:
+        source_label, source_type, source_url = source_for("operating_income")
+        evidence.append({"label":"본업으로 번 돈","value":_money(m.operating_income),"explanation":"제품과 서비스를 팔아 운영비를 내고도 돈이 남았어요." if m.operating_income > 0 else "제품과 서비스를 판 돈보다 운영비가 더 많이 들었어요.","tone":"good" if m.operating_income > 0 else "watch","source":source_label,"sourceType":source_type,"url":source_url})
+    if m.dilution is not None:
+        source_label, source_type, source_url = source_for("dilution")
+        evidence.append({"label":"1년 동안 주식 수 변화","value":f"{m.dilution:+.1f}%","explanation":"주식 수가 많이 늘면 기존 주주 한 명의 몫이 작아질 수 있어요.","tone":"good" if m.dilution <= 5 else "watch","source":source_label,"sourceType":source_type,"url":source_url})
+    if m.cash is not None:
+        source_label, source_type, source_url = source_for("cash")
+        evidence.append({"label":"회사가 가진 현금","value":_money(m.cash),"explanation":"급한 지출이나 성장을 위해 쓸 수 있는 돈이에요. 빚을 뺀 금액은 아니에요.","tone":"neutral","source":source_label,"sourceType":source_type,"url":source_url})
+    if m.dividend_per_share is not None:
+        source_label, source_type, source_url = source_for("dividend")
+        evidence.append({"label":"최근 1년 주당 배당금","value":f"${m.dividend_per_share:.2f}","explanation":f"회사 자료에서 최근 연간 배당 기록을 확인했어요. 이어진 기록은 약 {m.dividend_years or 0}년이에요.","tone":"good","source":source_label,"sourceType":source_type,"url":source_url})
     business = BUSINESS_SUMMARIES.get(m.ticker, f"SEC에 공시를 제출한 {m.company}예요. 구체적인 제품과 고객은 공시 원문에서 확인하세요.")
-    profit_phrase = "본업에서도 돈을 벌고 있어요" if (m.operating_income or 0) > 0 else "본업에서는 아직 손실이 나고 있어요"
+    profit_phrase = "본업에서도 돈을 벌고 있어요" if (m.operating_income or 0) > 0 else "본업에서는 아직 손실이 나고 있어요" if m.operating_income is not None else "본업의 이익 자료는 더 확인해야 해요"
+    growth_phrase = (
+        f"매출이 {abs(growth):.1f}% {'늘었고' if growth >= 0 else '줄었고'}"
+        if growth is not None
+        else "비교할 매출 자료가 없고"
+    )
+    why_found = (
+        f"최근 3개월 매출이 1년 전보다 {abs(growth):.1f}% {'늘었어요' if growth >= 0 else '줄었어요'}."
+        if growth is not None
+        else "최근 매출을 1년 전과 비교할 자료가 없어 다른 숫자를 먼저 확인했어요."
+    )
+    strongest_case = (
+        f"회사가 가진 현금 {_money(m.cash)}를 실제 자료에서 확인했어요."
+        if m.cash is not None
+        else "본업에서 실제로 이익을 내고 있어요."
+        if (m.operating_income or 0) > 0
+        else "확인 가능한 회사 자료를 모았지만 강한 재무 근거는 더 확인해야 해요."
+    )
     return {
         "ticker":m.ticker,"company":m.company,"score":max(0,score-len(risk_findings)*3),"preRiskScore":score,
         "business":business,
         "revenueHistory":[{"period":item["period"], "value":item["value"], "display":_money(item["value"])} for item in (m.revenue_history or [])],
-        "reason":f"매출이 {growth:.1f}% 변했고 {profit_phrase}",
-        "risk":risk_findings[0],"whyFound":f"최근 3개월 매출이 1년 전보다 {growth:.1f}% 늘었어요.",
-        "strongestCase":f"회사가 가진 현금 {_money(m.cash)}를 실제 자료에서 확인했어요.",
+        "reason":f"{growth_phrase} {profit_phrase}",
+        "risk":risk_findings[0],"whyFound":why_found,
+        "strongestCase":strongest_case,
         "penalty":f"주식 수 변화 {dilution:.1f}%와 회사가 돈을 벌고 있는지를 점수에 반영했어요.",
         "reversalEvent":"다음 매출이 둔화되거나 현금이 크게 줄거나 주식 수가 많이 늘면 다시 봐야 해요.",
         "evidence":evidence,
@@ -370,7 +442,7 @@ async def run_dig(
         {"count":len(growth_pass),"label":growth_label,"removed":len(available)-len(growth_pass),"explanation":growth_explanation,"rejected":[{"ticker":x.ticker,"reason":f"매출 증가 {x.revenue_growth:.1f}%" if x.revenue_growth is not None else "비교할 최신 자료가 없어요"} for x in available if x not in growth_pass][:3]},
         {"count":len(profit_pass),"label":"지금 돈을 벌고 있나","removed":len(growth_pass)-len(profit_pass),"explanation":"최근 분기 영업 흑자인 회사만 남겼어요." if profit_required else "적자 회사도 후보에 포함했어요.","rejected":[{"ticker":x.ticker,"reason":"최근 분기 영업 손실" if x.operating_income is not None else "영업이익 자료가 없어요"} for x in growth_pass if x not in profit_pass][:3]},
         {"count":len(dilution_pass),"label":"주식 수를 너무 늘렸나","removed":len(profit_pass)-len(dilution_pass),"explanation":f"1년 동안 주식 수가 {dilution_max:.0f}% 넘게 늘어난 회사를 뺐어요.","rejected":[{"ticker":x.ticker,"reason":f"주식 수가 {x.dilution:.1f}% 늘었어요"} for x in profit_pass if x not in dilution_pass][:3]},
-        {"count":exact_match_count,"label":"내 성향과 찾는 방향 반영","removed":max(0,len(dilution_pass)-exact_match_count),"explanation":f"{risk_level} 성향과 {intent} 방향의 숫자 조건을 적용했어요.","rejected":[]},
+        {"count":exact_match_count,"label":"자동으로 계산할 수 있는 조건 반영","removed":max(0,len(dilution_pass)-exact_match_count),"explanation":f"선택한 조건 중 회사 자료와 가격으로 정확히 계산할 수 있는 조건만 적용했어요. 성향: {risk_level}, 방향: {intent}.","rejected":[]},
     ]
     snapshot = repository.status() if cached else {"syncedAt":None}
     unsupported = ["앞으로의 주요 일정"]

@@ -36,6 +36,17 @@ equal(built.filters.lossAllowed, "제외");
 equal(built.profile.must.length, 3);
 equal(built.profile.intentId, "growth");
 
+const value = buildScreeningProfile("이익에 비해 싼 회사", "value", {
+  pe: "pe_25",
+  cheapBasis: "peers",
+});
+equal(value.profile.must.includes("25배 이하"), true);
+equal(value.profile.pending.includes("비슷한 회사보다"), true);
+
+const fallenQuestions = getQuestions("fallen", {});
+equal(fallenQuestions.some((question) => question.key === "compare"), false);
+equal(fallenQuestions.find((question) => question.key === "drawdown").bucket, "must");
+
 const unknowns = buildScreeningProfile("모르겠음", "quality", {
   growth: "unknown",
   profitability: "unknown",

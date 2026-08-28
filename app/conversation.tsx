@@ -41,6 +41,7 @@ export default function Conversation() {
   const [answers, setAnswers] = useState<ConversationAnswers>({});
   const setFilter = useDigStore((x) => x.setFilter);
   const riskProfile = useDigStore((x) => x.riskProfile);
+  const hasHydrated = useDigStore((x) => x.hasHydrated);
   const setScreeningProfile = useDigStore((x) => x.setScreeningProfile);
   const suggestedIntent = useMemo(() => inferIntent(query), [query]);
   const orderedIntents = useMemo(() => {
@@ -57,10 +58,10 @@ export default function Conversation() {
   );
 
   useEffect(() => {
-    if (!riskProfile) router.replace("/profile");
-  }, [riskProfile]);
+    if (hasHydrated && !riskProfile) router.replace("/profile");
+  }, [hasHydrated, riskProfile]);
 
-  if (!riskProfile) return null;
+  if (!hasHydrated || !riskProfile) return null;
 
   function start(text = query) {
     const clean = text.trim();

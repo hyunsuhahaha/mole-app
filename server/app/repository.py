@@ -41,6 +41,7 @@ class MetricsRepository:
                     filing_url TEXT,
                     filing_label TEXT,
                     revenue_history TEXT NOT NULL DEFAULT '[]',
+                    evidence_sources TEXT NOT NULL DEFAULT '{}',
                     synced_at TEXT NOT NULL
                 )
                 """
@@ -48,6 +49,8 @@ class MetricsRepository:
             columns = {row["name"] for row in db.execute("PRAGMA table_info(company_metrics)")}
             if "revenue_history" not in columns:
                 db.execute("ALTER TABLE company_metrics ADD COLUMN revenue_history TEXT NOT NULL DEFAULT '[]'")
+            if "evidence_sources" not in columns:
+                db.execute("ALTER TABLE company_metrics ADD COLUMN evidence_sources TEXT NOT NULL DEFAULT '{}'")
             for name, kind in (("shares_outstanding", "REAL"), ("eps_ttm", "REAL"), ("dividend_per_share", "REAL"), ("dividend_years", "INTEGER"), ("dividend_growth", "REAL")):
                 if name not in columns:
                     db.execute(f"ALTER TABLE company_metrics ADD COLUMN {name} {kind}")
@@ -61,6 +64,7 @@ class MetricsRepository:
             "dividend_years": None, "dividend_growth": None,
             **metric,
             "revenue_history": json.dumps(metric.get("revenue_history") or []),
+            "evidence_sources": json.dumps(metric.get("evidence_sources") or {}),
             "synced_at": datetime.now(UTC).isoformat(timespec="seconds"),
         }
         with closing(self._connect()) as db, db:
@@ -69,11 +73,11 @@ class MetricsRepository:
                 INSERT INTO company_metrics (
                     ticker, company, cik, revenue_growth, cash, dilution,
                     operating_income, shares_outstanding, eps_ttm, dividend_per_share,
-                    dividend_years, dividend_growth, filing_url, filing_label, revenue_history, synced_at
+                    dividend_years, dividend_growth, filing_url, filing_label, revenue_history, evidence_sources, synced_at
                 ) VALUES (
                     :ticker, :company, :cik, :revenue_growth, :cash, :dilution,
                     :operating_income, :shares_outstanding, :eps_ttm, :dividend_per_share,
-                    :dividend_years, :dividend_growth, :filing_url, :filing_label, :revenue_history, :synced_at
+                    :dividend_years, :dividend_growth, :filing_url, :filing_label, :revenue_history, :evidence_sources, :synced_at
                 )
                 ON CONFLICT(ticker) DO UPDATE SET
                     company=excluded.company,
@@ -90,6 +94,7 @@ class MetricsRepository:
                     filing_url=excluded.filing_url,
                     filing_label=excluded.filing_label,
                     revenue_history=excluded.revenue_history,
+                    evidence_sources=excluded.evidence_sources,
                     synced_at=excluded.synced_at
                 """,
                 values,
@@ -99,7 +104,7 @@ class MetricsRepository:
         """Atomically publish a fully parsed snapshot; keep the old one on failure."""
         synced_at = datetime.now(UTC).isoformat(timespec="seconds")
         defaults = {"shares_outstanding": None, "eps_ttm": None, "dividend_per_share": None, "dividend_years": None, "dividend_growth": None}
-        rows = [{**defaults, **metric, "revenue_history": json.dumps(metric.get("revenue_history") or []), "synced_at": synced_at} for metric in metrics]
+        rows = [{**defaults, **metric, "revenue_history": json.dumps(metric.get("revenue_history") or []), "evidence_sources": json.dumps(metric.get("evidence_sources") or {}), "synced_at": synced_at} for metric in metrics]
         with closing(self._connect()) as db, db:
             db.execute("BEGIN IMMEDIATE")
             db.execute("DELETE FROM company_metrics")
@@ -108,11 +113,11 @@ class MetricsRepository:
                 INSERT INTO company_metrics (
                     ticker, company, cik, revenue_growth, cash, dilution,
                     operating_income, shares_outstanding, eps_ttm, dividend_per_share,
-                    dividend_years, dividend_growth, filing_url, filing_label, revenue_history, synced_at
+                    dividend_years, dividend_growth, filing_url, filing_label, revenue_history, evidence_sources, synced_at
                 ) VALUES (
                     :ticker, :company, :cik, :revenue_growth, :cash, :dilution,
                     :operating_income, :shares_outstanding, :eps_ttm, :dividend_per_share,
-                    :dividend_years, :dividend_growth, :filing_url, :filing_label, :revenue_history, :synced_at
+                    :dividend_years, :dividend_growth, :filing_url, :filing_label, :revenue_history, :evidence_sources, :synced_at
                 )
                 """,
                 rows,
@@ -125,13 +130,14 @@ class MetricsRepository:
                 """
                 SELECT ticker, company, cik, revenue_growth, cash, dilution,
                        operating_income, shares_outstanding, eps_ttm, dividend_per_share,
-                       dividend_years, dividend_growth, filing_url, filing_label, revenue_history
+                       dividend_years, dividend_growth, filing_url, filing_label, revenue_history, evidence_sources
                 FROM company_metrics
                 """
             ).fetchall()
         result = [dict(row) for row in rows]
         for item in result:
             item["revenue_history"] = json.loads(item["revenue_history"] or "[]")
+            item["evidence_sources"] = json.loads(item["evidence_sources"] or "{}")
         return result
 
     def find(self, ticker: str) -> dict[str, Any] | None:
@@ -140,7 +146,7 @@ class MetricsRepository:
                 """
                 SELECT ticker, company, cik, revenue_growth, cash, dilution,
                        operating_income, shares_outstanding, eps_ttm, dividend_per_share,
-                       dividend_years, dividend_growth, filing_url, filing_label, revenue_history
+                       dividend_years, dividend_growth, filing_url, filing_label, revenue_history, evidence_sources
                 FROM company_metrics WHERE ticker = ?
                 """,
                 (ticker.upper(),),
@@ -149,6 +155,7 @@ class MetricsRepository:
             return None
         result = dict(row)
         result["revenue_history"] = json.loads(result["revenue_history"] or "[]")
+        result["evidence_sources"] = json.loads(result["evidence_sources"] or "{}")
         return result
 
     def search(self, query: str, limit: int = 20, featured: bool = False) -> list[dict[str, Any]]:

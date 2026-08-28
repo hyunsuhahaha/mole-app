@@ -78,11 +78,12 @@ function ChoiceGroup({
 }
 export default function Setup() {
   const riskProfile = useDigStore((state) => state.riskProfile);
-  useEffect(() => {
-    if (!riskProfile) router.replace("/profile?next=setup");
-  }, [riskProfile]);
-  if (!riskProfile) return null;
+  const hasHydrated = useDigStore((state) => state.hasHydrated);
   const [deep, setDeep] = useState(false);
+  useEffect(() => {
+    if (hasHydrated && !riskProfile) router.replace("/profile?next=setup");
+  }, [hasHydrated, riskProfile]);
+  if (!hasHydrated || !riskProfile) return null;
   return (
     <SafeAreaView style={s.page}>
       <View style={s.header}>
