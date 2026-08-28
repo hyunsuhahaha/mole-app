@@ -170,7 +170,7 @@ export default function Home() {
             onPress={() => router.push("/investors")}
             style={s.linkRow}
           >
-            <Text style={s.linkTitle}>투자자별로 보기</Text>
+            <Text style={s.linkTitle}>유명인 렌즈</Text>
             <Text style={s.linkArrow}>→</Text>
           </Pressable>
           <Pressable
